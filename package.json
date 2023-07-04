@@ -1,8 +1,8 @@
 {
   "name": "tech-spec",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "",
-  "main": "index.js",
+  "main": "dist/cli/index.js",
   "scripts": {
     "start": "ts-node src/index.ts",
     "build": "tsc"
