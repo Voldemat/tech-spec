@@ -7,6 +7,9 @@
     "start": "ts-node src/index.ts",
     "build": "tsc"
   },
+  "bin": {
+    "techspec": "./dist/cli/index.js"
+  },
   "keywords": [
     "cli",
     "technical-spec",

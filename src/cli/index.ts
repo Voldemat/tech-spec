@@ -1,5 +1,6 @@
+#! /usr/bin/env node
+
 import { Command } from 'commander'
-import fs from 'fs';
 import { validate } from './actions/validate';
 
 const program = new Command();
