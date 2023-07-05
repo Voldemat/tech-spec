@@ -152,21 +152,24 @@ function buildFormFieldAst(field: FormFieldSpecWithName) {
 }
 function buildFormAst(formName: string, fields: FormFieldSpecWithName[]) {
     return {
-        type: "VariableDeclaration",
-        kind: "const",
-        declarations: [
-            {
-                type: "VariableDeclarator",
-                id: {
-                    type: "Identifier",
-                    name: formName + 'Form'
-                },
-                init: {
-                    type: "ObjectExpression",
-                    properties: fields.map(buildFormFieldAst),
+        type: "ExportNamedDeclaration",
+        declaration: {
+            type: "VariableDeclaration",
+            kind: "const",
+            declarations: [
+                {
+                    type: "VariableDeclarator",
+                    id: {
+                        type: "Identifier",
+                        name: formName + 'Form'
+                    },
+                    init: {
+                        type: "ObjectExpression",
+                        properties: fields.map(buildFormFieldAst),
+                    }
                 }
-            }
-        ]
+            ]
+        }
     }
 }
 export function generateJSAstForm(form: Form) {
@@ -183,7 +186,7 @@ export function generateJSAstTreeFromSpecArray(specArray: TechSpec[]) {
     return {
         type: "Program",
         body: specArray.map(generateJSAstForm),
-        sourceType: "script"
+        sourceType: "module"
     }
 }
 export function printActionResult(program: Command, result: ActionResult) {
