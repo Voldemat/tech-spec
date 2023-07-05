@@ -1,10 +1,12 @@
 {
   "name": "tech-spec",
-  "version": "1.0.10",
+  "version": "1.0.11",
   "description": "",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
-  "files": ["/dist"],
+  "files": [
+    "/dist"
+  ],
   "scripts": {
     "cli": "ts-node src/cli/index.ts",
     "build": "tsc"
@@ -26,13 +28,13 @@
     "commander": "^11.0.0",
     "escodegen": "^2.1.0",
     "js-yaml": "^4.1.0",
+    "acorn": "^8.10.0",
     "lodash": "^4.17.21"
   },
   "devDependencies": {
     "@types/escodegen": "^0.0.7",
     "@types/js-yaml": "^4.0.5",
     "@types/lodash": "^4.14.195",
-    "acorn": "^8.10.0",
     "ast-types": "^0.14.2",
     "ts-node": "^10.9.1",
     "typescript": "^5.1.6"
