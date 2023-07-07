@@ -1,9 +1,9 @@
-name: "publish package to npm"
+name: "lint & publish"
 
 on: push
 
 jobs:
-  publish:
+  lintAndPublish:
     runs-on: ubuntu-latest
     steps:
       - name: checkout
@@ -15,9 +15,13 @@ jobs:
           registry-url: https://registry.npmjs.org
       - name: install
         run: npm ci
+      - name: lint
+        run: npm run lint
       - name: build
+        if: ${{ github.ref_type == 'tag' }}
         run: npm run build
       - name: publish
+        if: ${{ github.ref_type == 'tag' }}
         run: npm publish --access public
         env:
           NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
