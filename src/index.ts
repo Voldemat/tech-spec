@@ -1,8 +1,8 @@
 export {
-    FormValidationSpec,
-    ValidatorError,
-    ValidatorFunc,
+    type FormValidationSpec,
+    type ValidatorError,
+    type ValidatorFunc,
     buildValidator,
-    FormValidators,
-    buildValidators,
-} from './validators';
+    type FormValidators,
+    buildValidators
+} from './validators'

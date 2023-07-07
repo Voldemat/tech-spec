@@ -1,43 +1,43 @@
-import { SchemaObject } from "ajv";
+import { type SchemaObject } from 'ajv'
 
 export const schema: SchemaObject = {
-    type: "object",
+    type: 'object',
     properties: {
         type: {
-            enum: ["form"]
+            enum: ['form']
         },
         metadata: {
-            type: "object",
+            type: 'object',
             properties: {
                 name: {
-                    type: "string"
+                    type: 'string'
                 }
             },
             required: ['name']
         },
         spec: {
-            type: "object",
+            type: 'object',
             patternProperties: {
-                ".*": {
-                    type: "object",
+                '.*': {
+                    type: 'object',
                     properties: {
                         required: {
-                            type: "boolean",
-                            default: true,
+                            type: 'boolean',
+                            default: true
                         },
                         regex: {
-                            type: "string"
+                            type: 'string'
                         },
                         errorMessage: {
-                            type: "string",
+                            type: 'string',
                             nullable: true
-                        },
+                        }
                     },
                     required: ['regex', 'errorMessage', 'required']
                 }
             }
         }
     },
-    required: ["type", "metadata", "spec"],
-    additionalProperties: false,
+    required: ['type', 'metadata', 'spec'],
+    additionalProperties: false
 }

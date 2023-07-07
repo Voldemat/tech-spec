@@ -1,18 +1,22 @@
-import Ajv from 'ajv';
-import fs from 'fs';
-import path from 'path';
+import Ajv from 'ajv'
+import fs from 'fs'
+import path from 'path'
 import yaml from 'js-yaml'
-import { ActionResult, Form, FormFieldSpec, TechSpec } from '../types';
-import { schema } from '../schema';
-import { Command } from 'commander';
+import type {
+    ActionResult,
+    Form,
+    FormFieldSpec,
+    TechSpec
+} from '../types'
+import { schema } from '../schema'
 
-export function isDirExists(pathToDir: string): boolean {
+export function isDirExists (pathToDir: string): boolean {
     return fs.existsSync(pathToDir)
 }
-export function findFiles(pathToDir: string): string[] {
+export function findFiles (pathToDir: string): string[] {
     let filePaths: string[] = []
     fs.readdirSync(pathToDir).forEach(filePath => {
-        const fullPath = path.join(pathToDir, filePath);
+        const fullPath = path.join(pathToDir, filePath)
         const stat = fs.lstatSync(fullPath)
         if (stat.isDirectory()) {
             filePaths = filePaths.slice(filePath.indexOf(filePath), 1)
@@ -21,190 +25,150 @@ export function findFiles(pathToDir: string): string[] {
             filePaths.push(fullPath)
         }
     })
-    return filePaths;
+    return filePaths
 }
 const ajv = new Ajv({
     useDefaults: true,
-    allErrors: true,
-});
-export function validateSpec(data: Record<string, any>): string | null {
+    allErrors: true
+})
+export function validateSpec (data: Record<string, any>): string | null {
     const isValid = ajv.validate(schema, data)
     if (!isValid) {
         return JSON.stringify(ajv.errors, null, 4)
     }
-    return null;
+    return null
 }
-export function validateSpecArray(data: Record<string, any>[]): string | null {
-    const errors = data.map(validateSpec).filter(e => e !== null);
+export function validateSpecArray (
+    data: Array<Record<string, any>>
+): string | null {
+    const errors = data.map(validateSpec).filter(e => e !== null)
     if (errors.length === 0) {
-        return null;
+        return null
     }
-    return JSON.stringify(errors, null, 4);
+    return JSON.stringify(errors, null, 4)
 }
-export function loadFile(filePath: string): string {
+export function loadFile (filePath: string): string {
     return fs.readFileSync(filePath, 'utf-8')
 }
-export function parseYaml(yamlString: string): TechSpec {
+export function parseYaml (yamlString: string): TechSpec {
     return yaml.load(yamlString) as TechSpec
 }
-export function loadSpec(pathToDir: string): TechSpec[] {
+export function loadSpec (pathToDir: string): TechSpec[] {
     return findFiles(pathToDir)
         .map(loadFile)
-        .map(parseYaml);
+        .map(parseYaml)
 }
 interface FormFieldSpecWithName extends FormFieldSpec {
-    name: string
+  name: string
 }
-const exampleValue = {
-    "type": "ObjectExpression",
-    "properties": [
-        {
-            "type": "Property",
-            "key": {
-                "type": "Identifier",
-                "name": "required"
-            },
-            "value": {
-                "type": "Literal",
-                "value": true,
-                "raw": "true"
-            },
-            "kind": "init"
-        },
-        {
-            "type": "Property",
-            "key": {
-                "type": "Identifier",
-                "name": "regex"
-            },
-            "value": {
-                "type": "Literal",
-                "value": "",
-                "raw": "\"\""
-            },
-            "kind": "init"
-        },
-        {
-            "type": "Property",
-            "key": {
-                "type": "Identifier",
-                "name": "errorMessage"
-            },
-            "value": {
-                "type": "Literal",
-                "value": null,
-                "raw": "null"
-            },
-            "kind": "init"
-        }
-    ]
-}
-function buildFormFieldAst(field: FormFieldSpecWithName) {
+function buildFormFieldAst (field: FormFieldSpecWithName): Record<string, any> {
     return {
-        type: "Property",
+        type: 'Property',
         key: {
-            type: "Identifier",
+            type: 'Identifier',
             name: field.name
         },
-        kind: "init",
+        kind: 'init',
         value: {
-            type: "ObjectExpression",
+            type: 'ObjectExpression',
             properties: [
                 {
-                    "type": "Property",
-                    "key": {
-                        "type": "Identifier",
-                        "name": "required"
+                    type: 'Property',
+                    key: {
+                        type: 'Identifier',
+                        name: 'required'
                     },
-                    "value": {
-                        "type": "Literal",
-                        "value": field.required,
+                    value: {
+                        type: 'Literal',
+                        value: field.required
                     },
-                    "kind": "init"
+                    kind: 'init'
                 },
                 {
-                    "type": "Property",
-                    "key": {
-                        "type": "Identifier",
-                        "name": "regex"
+                    type: 'Property',
+                    key: {
+                        type: 'Identifier',
+                        name: 'regex'
                     },
-                    "value": {
-                        "type": "Literal",
-                        "value": field.regex,
+                    value: {
+                        type: 'Literal',
+                        value: field.regex
                     },
-                    "kind": "init"
+                    kind: 'init'
                 },
                 {
-                    "type": "Property",
-                    "key": {
-                        "type": "Identifier",
-                        "name": "errorMessage"
+                    type: 'Property',
+                    key: {
+                        type: 'Identifier',
+                        name: 'errorMessage'
                     },
-                    "value": {
-                        "type": "Literal",
-                        "value": field.errorMessage,
+                    value: {
+                        type: 'Literal',
+                        value: field.errorMessage
                     },
-                    "kind": "init"
+                    kind: 'init'
                 }
             ]
         }
     }
 }
-function buildFormAst(formName: string, fields: FormFieldSpecWithName[]) {
+function buildFormAst (
+    formName: string, fields: FormFieldSpecWithName[]
+): Record<string, any> {
     return {
-        type: "ExportNamedDeclaration",
+        type: 'ExportNamedDeclaration',
         declaration: {
-            type: "VariableDeclaration",
-            kind: "const",
+            type: 'VariableDeclaration',
+            kind: 'const',
             declarations: [
                 {
-                    type: "VariableDeclarator",
+                    type: 'VariableDeclarator',
                     id: {
-                        type: "Identifier",
+                        type: 'Identifier',
                         name: formName + 'Form'
                     },
                     init: {
-                        type: "ObjectExpression",
-                        properties: fields.map(buildFormFieldAst),
+                        type: 'ObjectExpression',
+                        properties: fields.map(buildFormFieldAst)
                     }
                 }
             ]
         }
     }
 }
-export function generateJSAstForm(form: Form) {
-    const formFields = Object.keys(form.spec) as (keyof Form['spec'])[]
+export function generateJSAstForm (form: Form): Record<string, any> {
+    const formFields = Object.keys(form.spec)
     const fields = formFields.map((fieldName): FormFieldSpecWithName => {
         return {
             ...form.spec[fieldName],
-            name: fieldName as string
+            name: fieldName
         }
     })
     return buildFormAst(form.metadata.name, fields)
 }
-export function generateJSAstTreeFromSpecArray(specArray: TechSpec[]) {
+export function generateJSAstTreeFromSpecArray (
+    specArray: TechSpec[]
+): Record<string, any> {
     return {
-        type: "Program",
+        type: 'Program',
         body: specArray.map(generateJSAstForm),
-        sourceType: "module"
+        sourceType: 'module'
     }
 }
-export function printActionResult(program: Command, result: ActionResult) {
-    if (result.isError) {
-        program.error(result.message)
-    } else {
-        console.log(result.message)
+export function toAbsolutePath (relativePath: string): string {
+    if (process.env.PWD == null) {
+        throw new Error('PWD End is not defined')
     }
+    return path.join(process.env.PWD, relativePath)
 }
-export function toAbsolutePath(relativePath: string): string {
-    return path.join(process.env.PWD!, relativePath)
-}
-export function buildActionCallback(fn: (...args: any) => ActionResult): () => void {
+export function buildActionCallback (
+    fn: (...args: any) => ActionResult
+): () => void {
     return (...args: any) => {
-        const result = fn(...args);
+        const result = fn(...args)
         if (result.isError) {
-            throw new Error(result.message);
+            throw new Error(result.message)
         }
-        console.log(result.message);
+        console.log(result.message)
     }
 }

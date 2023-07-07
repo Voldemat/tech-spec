@@ -1,12 +1,12 @@
-import { FormFieldSpec } from "../types";
+import { type FormFieldSpec } from '../types'
 
-export type FormValidationSpec = Record<string, FormFieldSpec> 
+export type FormValidationSpec = Record<string, FormFieldSpec>
 export interface ValidatorError {
-    isValid: boolean
-    errorMessage: string | null
+  isValid: boolean
+  errorMessage: string | null
 }
 export type ValidatorFunc = (value: string | null) => ValidatorError
-export function buildValidator(spec: FormFieldSpec): ValidatorFunc {
+export function buildValidator (spec: FormFieldSpec): ValidatorFunc {
     const regex = new RegExp(spec.regex)
     return (v: string | null) => {
         if (v === null) {
@@ -34,18 +34,18 @@ export function buildValidator(spec: FormFieldSpec): ValidatorFunc {
     }
 }
 export type FormValidators<T extends FormValidationSpec> = {
-    [key in keyof T]: ValidatorFunc
+  [key in keyof T]: ValidatorFunc
 }
-export function buildValidators<T extends FormValidationSpec>(
+export function buildValidators<T extends FormValidationSpec> (
     form: T
 ): FormValidators<T> {
-    const entries = Object.entries(form) as [keyof T, FormFieldSpec][]
-    return entries.reduce(
+    const entries = Object.entries(form) as Array<[keyof T, FormFieldSpec]>
+    return entries.reduce<FormValidators<T>>(
         (obj, entry) => {
-            const [key, field] = entry;
+            const [key, field] = entry
             obj[key] = buildValidator(field)
             return obj
         },
-        {} as FormValidators<T>
-    ) as FormValidators<T>
+        {}
+    )
 }
