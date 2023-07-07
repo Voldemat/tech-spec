@@ -1,5 +1,4 @@
 import fs from 'fs';
-import path from 'path';
 import { generate } from 'astring';
 import { ActionResult } from "../../types";
 import { generateJSAstTreeFromSpecArray, isDirExists, loadSpec, validateSpecArray } from "../utils";

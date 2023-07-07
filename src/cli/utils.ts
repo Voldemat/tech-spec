@@ -196,3 +196,15 @@ export function printActionResult(program: Command, result: ActionResult) {
         console.log(result.message)
     }
 }
+export function toAbsolutePath(relativePath: string): string {
+    return path.join(process.env.PWD!, relativePath)
+}
+export function buildActionCallback(fn: (...args: any) => ActionResult): () => void {
+    return (...args: any) => {
+        const result = fn(...args);
+        if (result.isError) {
+            throw new Error(result.message);
+        }
+        console.log(result.message);
+    }
+}

@@ -1,6 +1,3 @@
-import Ajv from 'ajv';
-import fs from 'fs';
-import yaml from 'js-yaml';
 import { ActionResult } from '../../types';
 import { findFiles, isDirExists, loadFile, parseYaml, validateSpec } from '../utils';
 
