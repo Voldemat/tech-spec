@@ -1,6 +1,9 @@
 import { Argument, Command } from 'commander'
-import { generateAction } from '../actions/generate'
-import { buildActionCallback, toAbsolutePath } from '../utils'
+import { AstFactory, CodeFactory } from '../../generators/js'
+import { YamlLoader } from '../../loaders/yaml'
+import { SpecFinder } from '../../spec/finder'
+import { GenerateAction } from '../actions/generate'
+import { buildActionCallback, FsUtils, SpecUtils } from '../utils'
 
 const typeArgument = new Argument(
     '<type>', 'Type of generated code'
@@ -20,10 +23,18 @@ export const generateCommand = (
                     pathToDir: string,
                     outputFile: string
                 ) => {
-                    return generateAction(
+                    const fsUtils = new FsUtils()
+                    return new GenerateAction(
+                        fsUtils,
+                        new YamlLoader(),
+                        new SpecUtils(),
+                        new AstFactory(),
+                        new SpecFinder(),
+                        new CodeFactory()
+                    ).run(
                         genType,
-                        toAbsolutePath(pathToDir),
-                        toAbsolutePath(outputFile)
+                        fsUtils.toAbsolutePath(pathToDir),
+                        fsUtils.toAbsolutePath(outputFile)
                     )
                 }
             )

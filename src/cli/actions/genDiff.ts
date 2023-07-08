@@ -1,81 +1,57 @@
-import fs from 'fs'
-import lodash from 'lodash'
-import acorn from 'acorn'
-import {
-    isDirExists,
-    loadSpecFilesData,
-    validateSpecArray
-} from '../utils'
-import { type ActionResult } from '../../types'
-import { generateJSAstTreeFromSpecArray } from '../../generators/js'
-import { type TechSpec } from '../../spec/types'
+import type { ActionResult } from '../../types'
+import type { AstFactory } from '../../generators/js'
+import type { IAction, TechSpec } from '../../spec/types'
+import type { YamlLoader } from '../../loaders/yaml'
+import type { SpecFinder } from '../../spec/finder'
+import type { FsUtils, SpecUtils } from '../utils'
 
-function nestedOmit (
-    obj: Record<string, any>, omitKeys: string[]
-): Record<string, any> {
-    const newObj: Record<string, any> = {}
-    Object.entries(obj).forEach(([key, value]: [string, any]) => {
-        if (omitKeys.includes(key)) {
-            return
+export class GenDiffAction implements IAction {
+    constructor (
+        private readonly fsUtils: FsUtils,
+        private readonly yamlLoader: YamlLoader,
+        private readonly specUtils: SpecUtils,
+        private readonly specFinder: SpecFinder,
+        private readonly astFactory: AstFactory
+    ) {}
+
+    run (
+        genType: 'validators',
+        pathToDir: string,
+        outputFile: string
+    ): ActionResult {
+        if (!this.fsUtils.isDirExists(pathToDir)) {
+            return {
+                isError: true,
+                message: 'Provided output directory does not exists'
+            }
         }
-        if (value instanceof Array) {
-            newObj[key] = value.map((v) => nestedOmit(v, omitKeys))
-        } else if (value instanceof Object) {
-            newObj[key] = nestedOmit(value, omitKeys)
-        } else {
-            newObj[key] = value
+        const specArray = this.specFinder
+            .findFiles(pathToDir)
+            .map(this.fsUtils.readFile)
+            .map(this.yamlLoader.load)
+        const error = this.specUtils.validateSpecArray(specArray)
+        if (error !== null) {
+            return {
+                isError: true,
+                message: error
+            }
         }
-    })
-    return newObj
-}
-export function genDiffAction (
-    genType: 'validators',
-    pathToDir: string,
-    outputFile: string
-): ActionResult {
-    if (!isDirExists(pathToDir)) {
+        const specAst = this.astFactory.generateJSAstTreeFromSpecArray(
+            specArray as TechSpec[]
+        )
+        const sourceCode = this.fsUtils.readFile(outputFile)
+        const sourceCodeAst = this.astFactory.generateJSAstTreeFromCode(
+            sourceCode
+        )
+        if (this.specUtils.isEqual(specAst, sourceCodeAst)) {
+            return {
+                isError: false,
+                message: 'Validators are consistent with spec'
+            }
+        }
         return {
             isError: true,
-            message: 'Provided output directory does not exists'
+            message: 'Validators are not consistent with spec'
         }
-    }
-    const specArray = loadSpecFilesData(pathToDir)
-    const error = validateSpecArray(specArray)
-    if (error !== null) {
-        return {
-            isError: true,
-            message: error
-        }
-    }
-    let specAst: any = generateJSAstTreeFromSpecArray(specArray as TechSpec[])
-    specAst = nestedOmit(specAst, ['sourceType'])
-    const currentSourceCode = fs.readFileSync(outputFile, 'utf-8')
-    let currentAst: any = acorn.parse(
-        currentSourceCode,
-        { ecmaVersion: 7, ranges: false, sourceType: 'module' }
-    )
-    currentAst = nestedOmit(
-        currentAst,
-        [
-            'specifiers',
-            'source',
-            'sourceType',
-            'start',
-            'end',
-            'method',
-            'shorthand',
-            'computed',
-            'raw'
-        ]
-    )
-    if (lodash.isEqual(specAst, currentAst)) {
-        return {
-            isError: false,
-            message: 'Validators are consistent with spec'
-        }
-    }
-    return {
-        isError: true,
-        message: 'Validators are not consistent with spec'
     }
 }

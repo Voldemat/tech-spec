@@ -1,3 +1,5 @@
+import type { ActionResult } from '../types'
+
 export interface FormMetadata {
     name: string
 }
@@ -13,3 +15,10 @@ export interface Form {
     spec: FormSpec
 }
 export type TechSpec = Form
+
+export interface ILoader {
+    load: (content: string) => Record<string, any>
+}
+export interface IAction {
+    run: (...args: any) => ActionResult
+}

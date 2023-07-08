@@ -1,6 +1,8 @@
 import { Command } from 'commander'
-import { validateAction } from '../actions/validate'
-import { buildActionCallback, toAbsolutePath } from '../utils'
+import { YamlLoader } from '../../loaders/yaml'
+import { SpecFinder } from '../../spec/finder'
+import { ValidateAction } from '../actions/validate'
+import { buildActionCallback, FsUtils, SpecUtils } from '../utils'
 
 export const validateCommand = (
     new Command('validate')
@@ -11,7 +13,15 @@ export const validateCommand = (
         .action(
             buildActionCallback(
                 (pathToDir: string) => {
-                    return validateAction(toAbsolutePath(pathToDir))
+                    const fsUtils = new FsUtils()
+                    return new ValidateAction(
+                        fsUtils,
+                        new SpecFinder(),
+                        new YamlLoader(),
+                        new SpecUtils()
+                    ).run(
+                        fsUtils.toAbsolutePath(pathToDir)
+                    )
                 }
             )
         )

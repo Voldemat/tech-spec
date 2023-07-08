@@ -1,6 +1,9 @@
 import { Argument, Command } from 'commander'
-import { genDiffAction } from '../actions/genDiff'
-import { buildActionCallback, toAbsolutePath } from '../utils'
+import { AstFactory } from '../../generators/js'
+import { SpecFinder } from '../../spec/finder'
+import { YamlLoader } from '../../loaders/yaml'
+import { GenDiffAction } from '../actions/genDiff'
+import { buildActionCallback, FsUtils, SpecUtils } from '../utils'
 
 const typeArgument = new Argument(
     '<type>', 'Type of generated code'
@@ -25,10 +28,17 @@ export const generateDiffCommand = (
                     pathToDir: string,
                     outputFile: string
                 ) => {
-                    return genDiffAction(
+                    const fsUtils = new FsUtils()
+                    return new GenDiffAction(
+                        fsUtils,
+                        new YamlLoader(),
+                        new SpecUtils(),
+                        new SpecFinder(),
+                        new AstFactory()
+                    ).run(
                         genType,
-                        toAbsolutePath(pathToDir),
-                        toAbsolutePath(outputFile)
+                        fsUtils.toAbsolutePath(pathToDir),
+                        fsUtils.toAbsolutePath(outputFile)
                     )
                 }
             )
