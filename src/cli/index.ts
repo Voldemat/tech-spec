@@ -1,19 +1,17 @@
 #! /usr/bin/env node
 
-import { Command } from 'commander'
-import { validateCommand } from './commands/validate'
-import { generateCommand } from './commands/generate'
-import { generateDiffCommand } from './commands/generateDiffCommand'
+import { AstFactory, CodeFactory } from '../generators/js'
+import { YamlLoader } from '../loaders/yaml'
+import { SpecFinder } from '../spec/finder'
+import { CLI } from './cli'
+import { FsUtils, SpecUtils } from './utils'
 
-const program = (
-    new Command()
-        .addCommand(validateCommand)
-        .addCommand(generateCommand)
-        .addCommand(generateDiffCommand)
+const cli = new CLI(
+    new FsUtils(),
+    new SpecUtils(),
+    new SpecFinder(),
+    new YamlLoader(),
+    new AstFactory(),
+    new CodeFactory()
 )
-try {
-    program.parse()
-} catch (e: any) {
-    console.error(e.message)
-    process.exit(1)
-}
+cli.run()

@@ -2,9 +2,9 @@ import fs from 'fs'
 import path from 'path'
 import yaml from 'js-yaml'
 import lodash from 'lodash'
-import type { ActionResult } from '../types'
 import { validateSpec } from '../spec/validator'
-import { type TechSpec } from '../spec/types'
+import type { IAction, TechSpec } from '../spec/types'
+import { type Command } from 'commander'
 
 export class FsUtils {
     isDirExists (pathToDir: string): boolean {
@@ -46,12 +46,12 @@ export class SpecUtils {
 }
 
 export function buildActionCallback (
-    fn: (...args: any) => ActionResult
+    program: Command, action: IAction
 ): () => void {
     return (...args: any) => {
-        const result = fn(...args)
+        const result = action.run(...args)
         if (result.isError) {
-            throw new Error(result.message)
+            program.error(result.message)
         }
         console.log(result.message)
     }

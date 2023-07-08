@@ -13,6 +13,7 @@ export class ValidateAction implements IAction {
     ) {}
 
     run (pathToDir: string): ActionResult {
+        pathToDir = this.fsUtils.toAbsolutePath(pathToDir)
         if (!this.fsUtils.isDirExists(pathToDir)) {
             return {
                 isError: true,

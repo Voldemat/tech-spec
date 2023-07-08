@@ -21,6 +21,8 @@ export class GenerateAction implements IAction {
         pathToDir: string,
         outputFile: string
     ): ActionResult {
+        pathToDir = this.fsUtils.toAbsolutePath(pathToDir)
+        outputFile = this.fsUtils.toAbsolutePath(outputFile)
         if (!this.fsUtils.isDirExists(pathToDir)) {
             return {
                 isError: true,
