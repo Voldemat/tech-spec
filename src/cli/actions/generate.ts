@@ -2,12 +2,13 @@ import fs from 'fs'
 import { generate } from 'astring'
 import { type ActionResult } from '../../types'
 import {
-    generateJSAstTreeFromSpecArray,
     isDirExists,
-    loadSpec,
+    loadSpecFilesData,
     validateSpecArray
 } from '../utils'
 import { type Node } from 'acorn'
+import { generateJSAstTreeFromSpecArray } from '../../generators/js'
+import { type TechSpec } from '../../spec/types'
 
 export function generateAction (
     genType: 'validators',
@@ -20,7 +21,7 @@ export function generateAction (
             message: 'Provided output directory does not exists'
         }
     }
-    const specArray = loadSpec(pathToDir)
+    const specArray = loadSpecFilesData(pathToDir)
     const error = validateSpecArray(specArray)
     if (error !== null) {
         return {
@@ -28,7 +29,7 @@ export function generateAction (
             message: error
         }
     }
-    const ast = generateJSAstTreeFromSpecArray(specArray)
+    const ast = generateJSAstTreeFromSpecArray(specArray as TechSpec[])
     const sourceCode = generate(ast as Node)
     fs.writeFileSync(outputFile, sourceCode)
     return {

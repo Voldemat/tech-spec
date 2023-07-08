@@ -1,160 +1,33 @@
-import Ajv from 'ajv'
 import fs from 'fs'
 import path from 'path'
 import yaml from 'js-yaml'
-import type {
-    ActionResult,
-    Form,
-    FormFieldSpec,
-    TechSpec
-} from '../types'
-import { schema } from '../schema'
+import type { ActionResult } from '../types'
+import { validateSpec } from '../spec/validator'
+import { findFiles } from '../spec/finder'
+import { type TechSpec } from '../spec/types'
 
 export function isDirExists (pathToDir: string): boolean {
     return fs.existsSync(pathToDir)
 }
-export function findFiles (pathToDir: string): string[] {
-    let filePaths: string[] = []
-    fs.readdirSync(pathToDir).forEach(filePath => {
-        const fullPath = path.join(pathToDir, filePath)
-        const stat = fs.lstatSync(fullPath)
-        if (stat.isDirectory()) {
-            filePaths = filePaths.slice(filePath.indexOf(filePath), 1)
-            filePaths.push(...findFiles(fullPath))
-        } else if (filePath.endsWith('.tech-spec.yaml')) {
-            filePaths.push(fullPath)
-        }
-    })
-    return filePaths
-}
-const ajv = new Ajv({
-    useDefaults: true,
-    allErrors: true
-})
-export function validateSpec (data: Record<string, any>): string | null {
-    const isValid = ajv.validate(schema, data)
-    if (!isValid) {
-        return JSON.stringify(ajv.errors, null, 4)
-    }
-    return null
-}
+
 export function validateSpecArray (
     data: Array<Record<string, any>>
 ): string | null {
     const errors = data.map(validateSpec).filter(e => e !== null)
-    if (errors.length === 0) {
-        return null
-    }
+    if (errors.length === 0) { return null }
     return JSON.stringify(errors, null, 4)
-}
-export function loadFile (filePath: string): string {
-    return fs.readFileSync(filePath, 'utf-8')
 }
 export function parseYaml (yamlString: string): TechSpec {
     return yaml.load(yamlString) as TechSpec
 }
-export function loadSpec (pathToDir: string): TechSpec[] {
+export function loadSpecFilesData (
+    pathToDir: string
+): Array<Record<string, any>> {
     return findFiles(pathToDir)
-        .map(loadFile)
-        .map(parseYaml)
+        .map(filePath => fs.readFileSync(filePath, 'utf-8'))
+        .map(content => yaml.load(content) as Record<string, any>)
 }
-interface FormFieldSpecWithName extends FormFieldSpec {
-  name: string
-}
-function buildFormFieldAst (field: FormFieldSpecWithName): Record<string, any> {
-    return {
-        type: 'Property',
-        key: {
-            type: 'Identifier',
-            name: field.name
-        },
-        kind: 'init',
-        value: {
-            type: 'ObjectExpression',
-            properties: [
-                {
-                    type: 'Property',
-                    key: {
-                        type: 'Identifier',
-                        name: 'required'
-                    },
-                    value: {
-                        type: 'Literal',
-                        value: field.required
-                    },
-                    kind: 'init'
-                },
-                {
-                    type: 'Property',
-                    key: {
-                        type: 'Identifier',
-                        name: 'regex'
-                    },
-                    value: {
-                        type: 'Literal',
-                        value: field.regex
-                    },
-                    kind: 'init'
-                },
-                {
-                    type: 'Property',
-                    key: {
-                        type: 'Identifier',
-                        name: 'errorMessage'
-                    },
-                    value: {
-                        type: 'Literal',
-                        value: field.errorMessage
-                    },
-                    kind: 'init'
-                }
-            ]
-        }
-    }
-}
-function buildFormAst (
-    formName: string, fields: FormFieldSpecWithName[]
-): Record<string, any> {
-    return {
-        type: 'ExportNamedDeclaration',
-        declaration: {
-            type: 'VariableDeclaration',
-            kind: 'const',
-            declarations: [
-                {
-                    type: 'VariableDeclarator',
-                    id: {
-                        type: 'Identifier',
-                        name: formName + 'Form'
-                    },
-                    init: {
-                        type: 'ObjectExpression',
-                        properties: fields.map(buildFormFieldAst)
-                    }
-                }
-            ]
-        }
-    }
-}
-export function generateJSAstForm (form: Form): Record<string, any> {
-    const formFields = Object.keys(form.spec)
-    const fields = formFields.map((fieldName): FormFieldSpecWithName => {
-        return {
-            ...form.spec[fieldName],
-            name: fieldName
-        }
-    })
-    return buildFormAst(form.metadata.name, fields)
-}
-export function generateJSAstTreeFromSpecArray (
-    specArray: TechSpec[]
-): Record<string, any> {
-    return {
-        type: 'Program',
-        body: specArray.map(generateJSAstForm),
-        sourceType: 'module'
-    }
-}
+
 export function toAbsolutePath (relativePath: string): string {
     if (process.env.PWD == null) {
         throw new Error('PWD End is not defined')

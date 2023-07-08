@@ -1,17 +1,13 @@
 import { type SchemaObject } from 'ajv'
 
-export const schema: SchemaObject = {
+export const techSpecSchema: SchemaObject = {
     type: 'object',
     properties: {
-        type: {
-            enum: ['form']
-        },
+        type: { enum: ['form'] },
         metadata: {
             type: 'object',
             properties: {
-                name: {
-                    type: 'string'
-                }
+                name: { type: 'string' }
             },
             required: ['name']
         },
@@ -25,9 +21,7 @@ export const schema: SchemaObject = {
                             type: 'boolean',
                             default: true
                         },
-                        regex: {
-                            type: 'string'
-                        },
+                        regex: { type: 'string' },
                         errorMessage: {
                             type: 'string',
                             nullable: true

@@ -1,4 +1,4 @@
-import { type FormFieldSpec } from '../types'
+import { type FormFieldSpec } from '../spec/types'
 
 export type FormValidationSpec = Record<string, FormFieldSpec>
 export interface ValidatorError {
@@ -40,12 +40,12 @@ export function buildValidators<T extends FormValidationSpec> (
     form: T
 ): FormValidators<T> {
     const entries = Object.entries(form) as Array<[keyof T, FormFieldSpec]>
-    return entries.reduce<FormValidators<T>>(
+    return entries.reduce<Partial<FormValidators<T>>>(
         (obj, entry) => {
             const [key, field] = entry
             obj[key] = buildValidator(field)
             return obj
         },
         {}
-    )
+    ) as FormValidators<T>
 }

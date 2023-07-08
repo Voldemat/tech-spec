@@ -2,12 +2,13 @@ import fs from 'fs'
 import lodash from 'lodash'
 import acorn from 'acorn'
 import {
-    generateJSAstTreeFromSpecArray,
     isDirExists,
-    loadSpec,
+    loadSpecFilesData,
     validateSpecArray
 } from '../utils'
 import { type ActionResult } from '../../types'
+import { generateJSAstTreeFromSpecArray } from '../../generators/js'
+import { type TechSpec } from '../../spec/types'
 
 function nestedOmit (
     obj: Record<string, any>, omitKeys: string[]
@@ -38,7 +39,7 @@ export function genDiffAction (
             message: 'Provided output directory does not exists'
         }
     }
-    const specArray = loadSpec(pathToDir)
+    const specArray = loadSpecFilesData(pathToDir)
     const error = validateSpecArray(specArray)
     if (error !== null) {
         return {
@@ -46,7 +47,7 @@ export function genDiffAction (
             message: error
         }
     }
-    let specAst: any = generateJSAstTreeFromSpecArray(specArray)
+    let specAst: any = generateJSAstTreeFromSpecArray(specArray as TechSpec[])
     specAst = nestedOmit(specAst, ['sourceType'])
     const currentSourceCode = fs.readFileSync(outputFile, 'utf-8')
     let currentAst: any = acorn.parse(

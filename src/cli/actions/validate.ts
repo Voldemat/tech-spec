@@ -1,10 +1,8 @@
+import { validateSpec } from '../../spec/validator'
 import { type ActionResult } from '../../types'
 import {
-    findFiles,
     isDirExists,
-    loadFile,
-    parseYaml,
-    validateSpec
+    loadSpecFilesData
 } from '../utils'
 
 export function validateAction (pathToDir: string): ActionResult {
@@ -14,9 +12,7 @@ export function validateAction (pathToDir: string): ActionResult {
             message: 'Provided directory does not exists'
         }
     }
-    const errors = findFiles(pathToDir)
-        .map(loadFile)
-        .map(parseYaml)
+    const errors = loadSpecFilesData(pathToDir)
         .map(validateSpec)
         .filter(e => e !== null)
     if (errors.length === 0) {
