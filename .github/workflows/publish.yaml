@@ -1,9 +1,9 @@
-name: "lint & publish"
+name: "lint & test & publish"
 
 on: push
 
 jobs:
-  lintAndPublish:
+  main:
     runs-on: ubuntu-latest
     steps:
       - name: checkout
@@ -17,6 +17,8 @@ jobs:
         run: npm ci
       - name: lint
         run: npm run lint
+      - name: test
+        run: npm run test
       - name: build
         if: ${{ github.ref_type == 'tag' }}
         run: npm run build
