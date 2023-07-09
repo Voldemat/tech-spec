@@ -31,6 +31,12 @@ export class GenDiffAction implements IAction {
             .findFiles(pathToDir)
             .map(this.fsUtils.readFile)
             .map(this.yamlLoader.load)
+        if (specArray.length === 0) {
+            return {
+                isError: true,
+                message: 'Provided directory doesn`t have any spec yaml files'
+            }
+        }
         const error = this.specUtils.validateSpecArray(specArray)
         if (error !== null) {
             return {
