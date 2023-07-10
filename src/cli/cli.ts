@@ -1,7 +1,6 @@
 import { Command } from 'commander'
 import { generateCommand } from './commands/generate'
 import { buildActionCallback, type FsUtils, type SpecUtils } from './utils'
-import type { SpecFinder } from '../spec/finder'
 import type { YamlLoader } from '../loaders/yaml'
 import type { AstFactory, CodeFactory } from '../generators/js'
 import { GenerateAction } from './actions/generate'
@@ -15,7 +14,6 @@ export class CLI {
     constructor (
         fsUtils: FsUtils,
         specUtils: SpecUtils,
-        specFinder: SpecFinder,
         yamlLoader: YamlLoader,
         astFactory: AstFactory,
         codeFactory: CodeFactory
@@ -30,7 +28,6 @@ export class CLI {
                         yamlLoader,
                         specUtils,
                         astFactory,
-                        specFinder,
                         codeFactory
                     )
                 )
@@ -42,7 +39,6 @@ export class CLI {
                     this.program,
                     new ValidateAction(
                         fsUtils,
-                        specFinder,
                         yamlLoader,
                         specUtils
                     )
@@ -57,7 +53,6 @@ export class CLI {
                         fsUtils,
                         yamlLoader,
                         specUtils,
-                        specFinder,
                         astFactory
                     )
                 )

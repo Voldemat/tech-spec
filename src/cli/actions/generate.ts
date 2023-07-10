@@ -23,7 +23,7 @@ export class GenerateAction implements IAction {
         if (!this.fsUtils.isDirExists(specDir)) {
             return {
                 isError: true,
-                message: 'Provided output directory does not exists'
+                message: 'Provided spec directory does not exists'
             }
         }
         const specArray = this.fsUtils.findSpecFiles(specDir)
@@ -40,6 +40,9 @@ export class GenerateAction implements IAction {
             specArray as TechSpec[]
         )
         const specCode = this.codeFactory.generate(ast)
+        if (!this.fsUtils.isDirExists(outputDir)) {
+            this.fsUtils.createDir(outputDir)
+        }
         for (const [type, code] of getEntries(specCode)) {
             this.fsUtils.writeToFile(
                 this.fsUtils.genCodeFileName(outputDir, type),

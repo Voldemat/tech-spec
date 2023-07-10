@@ -1,15 +1,21 @@
-import Ajv from 'ajv'
+import Ajv, { type ErrorObject } from 'ajv'
 import { techSpecSchema } from './schema'
 
 const ajv = new Ajv({
     useDefaults: true,
-    allErrors: true
+    allErrors: true,
+    discriminator: true,
+    strict: false
 })
 const validateSchema = ajv.compile<boolean>(techSpecSchema)
-export function validateSpec (data: Record<string, any>): string | null {
+export function validateSpec (
+    data: Record<string, any>
+): Array<ErrorObject<string, Record<string, any>, unknown>> | null {
     const isValid = validateSchema(data)
     if (!isValid) {
-        return JSON.stringify(ajv.errors, null, 4)
+        return validateSchema.errors as Array<
+            ErrorObject<string, Record<string, any>, unknown>
+        >
     }
     return null
 }

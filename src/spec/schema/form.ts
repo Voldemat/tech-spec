@@ -1,9 +1,6 @@
-import { type SchemaObject } from 'ajv'
-
-export const techSpecSchema: SchemaObject = {
-    type: 'object',
+export const formScheme = {
     properties: {
-        type: { enum: ['form'] },
+        type: { const: 'form' },
         metadata: {
             type: 'object',
             properties: {

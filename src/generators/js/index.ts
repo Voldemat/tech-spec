@@ -1,6 +1,6 @@
 import acorn from 'acorn'
-import astring from 'astring'
-import type { Form, FormFieldSpec, TechSpec } from '../../spec/types'
+import * as astring from 'astring'
+import type { Form, FormFieldSpec, TechSpec, Theme } from '../../spec/types'
 import { getEntries } from '../../utils'
 import type { SpecCode, TechSpecAst } from '../types'
 
@@ -20,12 +20,8 @@ export class AstFactory {
                 [
                     'specifiers',
                     'source',
-                    'sourceType',
                     'start',
                     'end',
-                    'method',
-                    'shorthand',
-                    'computed',
                     'raw'
                 ]
             )
@@ -56,16 +52,30 @@ export class AstFactory {
     fromSpec (
         specArray: TechSpec[]
     ): TechSpecAst {
-        const forms = specArray.filter(spec => spec.type === 'form')
+        const forms = specArray.filter(
+            (spec): spec is Form => spec.type === 'form'
+        )
+        const themes = specArray.filter(
+            (spec): spec is Theme => spec.type === 'theme'
+        )
         return {
-            form: this.genFormsAstFile(forms)
+            form: this.genFormsAstFile(forms),
+            theme: this.genThemesAstFile(themes)
+        }
+    }
+
+    genThemesAstFile (themes: Theme[]): Record<string, any> {
+        return {
+            type: 'Program',
+            body: [],
+            sourceType: 'module'
         }
     }
 
     genFormsAstFile (forms: Form[]): Record<string, any> {
         return {
             type: 'Program',
-            body: forms.map(this.genFormAst),
+            body: forms.map(form => this.genFormAst(form)),
             sourceType: 'module'
         }
     }
@@ -115,6 +125,9 @@ export class AstFactory {
         const fieldKeys = Object.keys(field) as Array<(keyof FormFieldSpec)>
         return {
             type: 'Property',
+            method: false,
+            shorthand: false,
+            computed: false,
             key: {
                 type: 'Identifier',
                 name
@@ -124,6 +137,9 @@ export class AstFactory {
                 type: 'ObjectExpression',
                 properties: fieldKeys.map(fieldKey => ({
                     type: 'Property',
+                    method: false,
+                    shorthand: false,
+                    computed: false,
                     key: {
                         type: 'Identifier',
                         name: fieldKey
@@ -143,7 +159,11 @@ export class CodeFactory {
         return getEntries(ast)
             .reduce<Partial<SpecCode>>(
                 (obj, [type, ast]) => {
-                    obj[type] = astring.generate(ast as astring.Node)
+                    let code: string = ''
+                    if (Object.keys(ast).length !== 0) {
+                        code = astring.generate(ast as astring.Node)
+                    }
+                    obj[type] = code
                     return obj
                 },
                 {}

@@ -57,6 +57,10 @@ export class FsUtils {
         })
         return filePaths
     }
+
+    createDir (dir: string): void {
+        fs.mkdirSync(dir, { recursive: true })
+    }
 }
 export class SpecUtils {
     validateSpecArray (data: Array<Record<string, any>>): string | null {

@@ -14,7 +14,18 @@ export interface Form {
     metadata: FormMetadata
     spec: FormSpec
 }
-export type TechSpec = Form
+export interface ThemeMetadata {
+    name: string
+}
+export interface ThemeSpec {
+    colors: Record<string, string>
+}
+export interface Theme {
+    type: 'theme'
+    metadata: ThemeMetadata
+    spec: ThemeSpec
+}
+export type TechSpec = Form | Theme
 
 export interface ILoader {
     load: (content: string) => Record<string, any>

@@ -22,7 +22,7 @@ export class GenDiffAction implements IAction {
         if (!this.fsUtils.isDirExists(specDir)) {
             return {
                 isError: true,
-                message: 'Provided output directory does not exists'
+                message: 'Provided spec directory does not exists'
             }
         }
         const specArray = this.fsUtils
