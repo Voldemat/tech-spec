@@ -43,12 +43,9 @@ export class GenerateAction implements IAction {
         if (!this.fsUtils.isDirExists(outputDir)) {
             this.fsUtils.createDir(outputDir)
         }
-        const existingEntries = getEntries(specCode)
-            .filter(
-                (entry): entry is [TechSpec['type'], string] => (
-                    entry[1] !== null
-                )
-            )
+        const existingEntries = getEntries(
+            specCode
+        ) as Array<[TechSpec['type'], string]>
         for (const [type, code] of existingEntries) {
             this.fsUtils.writeToFile(
                 this.fsUtils.genCodeFileName(outputDir, type),

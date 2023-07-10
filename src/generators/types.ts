@@ -1,4 +1,4 @@
 import type { TechSpec } from '../spec/types'
 
-export type TechSpecAst = Record<TechSpec['type'], Record<string, any> | null>
-export type SpecCode = Record<TechSpec['type'], string | null>
+export type TechSpecAst = Partial<Record<TechSpec['type'], Record<string, any>>>
+export type SpecCode = Partial<Record<TechSpec['type'], string>>

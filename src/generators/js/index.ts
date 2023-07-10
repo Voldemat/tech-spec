@@ -58,16 +58,22 @@ export class AstFactory {
         const themes = specArray.filter(
             (spec): spec is Theme => spec.type === 'theme'
         )
-        return {
-            form: this.genFormsAstFile(forms),
-            theme: this.genThemesAstFile(themes)
+        const techSpecAst: TechSpecAst = {}
+        const formsAst = this.genFormsAstFile(forms)
+        if (formsAst !== undefined) {
+            techSpecAst.form = formsAst
         }
+        const themesAst = this.genThemesAstFile(themes)
+        if (themesAst !== undefined) {
+            techSpecAst.theme = themesAst
+        }
+        return techSpecAst
     }
 
-    genThemesAstFile (themes: Theme[]): Record<string, any> | null {
+    genThemesAstFile (themes: Theme[]): Record<string, any> | undefined {
         const themeAstBody = this.buildThemeAst(themes)
         if (themeAstBody === null) {
-            return null
+            return undefined
         }
         return {
             type: 'Program',
@@ -253,16 +259,21 @@ export class AstFactory {
 export class CodeFactory {
     generate (ast: TechSpecAst): SpecCode {
         return getEntries(ast)
-            .reduce<Partial<SpecCode>>(
+            .filter(
+                (entry): entry is [
+                    keyof TechSpecAst, Record<string, any>
+                ] => {
+                    return entry?.[1] !== undefined
+                }
+            )
+            .reduce<SpecCode>(
                 (obj, [type, ast]) => {
-                    let code: string | null = null
-                    if (ast !== null) {
-                        code = astring.generate(ast as astring.Node)
+                    if (ast !== undefined) {
+                        obj[type] = astring.generate(ast as astring.Node)
                     }
-                    obj[type] = code
                     return obj
                 },
                 {}
-            ) as SpecCode
+            )
     }
 }
