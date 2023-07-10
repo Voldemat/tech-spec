@@ -67,9 +67,101 @@ export class AstFactory {
     genThemesAstFile (themes: Theme[]): Record<string, any> {
         return {
             type: 'Program',
-            body: [],
+            body: [this.buildThemeAst(themes)],
             sourceType: 'module'
         }
+    }
+
+    buildThemeAst (themes: Theme[]): Record<string, any> {
+        if (themes.length < 1) return {}
+        return {
+            type: 'ExportNamedDeclaration',
+            declaration: {
+                type: 'VariableDeclaration',
+                kind: 'const',
+                declarations: [
+                    {
+                        type: 'VariableDeclarator',
+                        id: {
+                            type: 'Identifier',
+                            name: 'design'
+                        },
+                        init: {
+                            type: 'ObjectExpression',
+                            properties: [this.buildThemeProperties(themes)]
+                        }
+                    }
+                ]
+            }
+        }
+    }
+
+    buildThemeProperties (themes: Theme[]): Record<string, any> {
+        const colors = Object.keys(themes[0].spec.colors)
+        const colorsObject = colors.reduce<
+            Record<string, Record<string, string>>
+        >(
+            (obj, color) => {
+                obj[color] = this.buildThemeColorObject(color, themes)
+                return obj
+            },
+            {}
+        )
+        return {
+            type: 'Property',
+            method: false,
+            shorthand: false,
+            computed: false,
+            key: {
+                type: 'Identifier',
+                name: 'colors'
+            },
+            kind: 'init',
+            value: {
+                type: 'ObjectExpression',
+                properties: colors.map(color => ({
+                    type: 'Property',
+                    method: false,
+                    shorthand: false,
+                    computed: false,
+                    kind: 'init',
+                    key: {
+                        type: 'Identifier',
+                        name: color
+                    },
+                    value: {
+                        type: 'ObjectExpression',
+                        properties: getEntries(colorsObject[color])
+                            .map(([key, value]) => {
+                                return {
+                                    type: 'Property',
+                                    method: false,
+                                    computed: false,
+                                    shorthand: false,
+                                    key: {
+                                        type: 'Identifier',
+                                        name: key
+                                    },
+                                    kind: 'init',
+                                    value: {
+                                        type: 'Literal',
+                                        value
+                                    }
+                                }
+                            })
+                    }
+                }))
+            }
+        }
+    }
+
+    buildThemeColorObject (
+        color: string, themes: Theme[]
+    ): Record<string, string> {
+        return themes.reduce<Record<string, string>>((kObj, theme) => {
+            kObj[theme.metadata.name] = theme.spec.colors[color]
+            return kObj
+        }, {})
     }
 
     genFormsAstFile (forms: Form[]): Record<string, any> {
