@@ -1,5 +1,4 @@
 import type { YamlLoader } from '../../loaders/yaml'
-import type { SpecFinder } from '../../spec/finder'
 import type { IAction } from '../../spec/types'
 import type { ActionResult } from '../../types'
 import type { FsUtils, SpecUtils } from '../utils'
@@ -7,7 +6,6 @@ import type { FsUtils, SpecUtils } from '../utils'
 export class ValidateAction implements IAction {
     constructor (
         private readonly fsUtils: FsUtils,
-        private readonly specFinder: SpecFinder,
         private readonly yamlLoader: YamlLoader,
         private readonly specUtils: SpecUtils
     ) {}
@@ -21,7 +19,7 @@ export class ValidateAction implements IAction {
             }
         }
         const error = this.specUtils.validateSpecArray(
-            this.specFinder.findFiles(pathToDir)
+            this.fsUtils.findSpecFiles(pathToDir)
                 .map(this.fsUtils.readFile)
                 .map(this.yamlLoader.load)
         )

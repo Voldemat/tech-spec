@@ -1,27 +1,37 @@
 import acorn from 'acorn'
 import astring from 'astring'
 import type { Form, FormFieldSpec, TechSpec } from '../../spec/types'
+import { getEntries } from '../../utils'
+import type { SpecCode, TechSpecAst } from '../types'
 
 export class AstFactory {
-    generateJSAstTreeFromCode (code: string): Record<string, any> {
-        const currentAst: any = acorn.parse(
-            code,
-            { ecmaVersion: 7, ranges: false, sourceType: 'module' }
+    fromCode (specCode: SpecCode): TechSpecAst {
+        const specAst: Partial<TechSpecAst> = {}
+        const specCodeEntries = (
+            Object.entries(specCode) as Array<[keyof SpecCode, string]>
         )
-        return this.nestedOmit(
-            currentAst,
-            [
-                'specifiers',
-                'source',
-                'sourceType',
-                'start',
-                'end',
-                'method',
-                'shorthand',
-                'computed',
-                'raw'
-            ]
-        )
+        specCodeEntries.forEach(([type, code]) => {
+            const codeAst: Record<string, any> = acorn.parse(
+                code,
+                { ecmaVersion: 7, ranges: false, sourceType: 'module' }
+            )
+            const finalAst = this.nestedOmit(
+                codeAst,
+                [
+                    'specifiers',
+                    'source',
+                    'sourceType',
+                    'start',
+                    'end',
+                    'method',
+                    'shorthand',
+                    'computed',
+                    'raw'
+                ]
+            )
+            specAst[type] = finalAst
+        })
+        return specAst as TechSpecAst
     }
 
     nestedOmit (
@@ -43,17 +53,24 @@ export class AstFactory {
         return newObj
     }
 
-    generateJSAstTreeFromSpecArray (
+    fromSpec (
         specArray: TechSpec[]
-    ): Record<string, any> {
+    ): TechSpecAst {
+        const forms = specArray.filter(spec => spec.type === 'form')
+        return {
+            form: this.genFormsAstFile(forms)
+        }
+    }
+
+    genFormsAstFile (forms: Form[]): Record<string, any> {
         return {
             type: 'Program',
-            body: specArray.map(this.generateJSAstForm),
+            body: forms.map(this.genFormAst),
             sourceType: 'module'
         }
     }
 
-    generateJSAstForm (form: Form): Record<string, any> {
+    genFormAst (form: Form): Record<string, any> {
         const formFields = Object.keys(form.spec)
         const fieldsEntries = formFields.map(
             (fieldName): [string, FormFieldSpec] => {
@@ -122,7 +139,14 @@ export class AstFactory {
     }
 }
 export class CodeFactory {
-    generate (ast: astring.Node): string {
-        return astring.generate(ast)
+    generate (ast: TechSpecAst): SpecCode {
+        return getEntries(ast)
+            .reduce<Partial<SpecCode>>(
+                (obj, [type, ast]) => {
+                    obj[type] = astring.generate(ast as astring.Node)
+                    return obj
+                },
+                {}
+            ) as SpecCode
     }
 }

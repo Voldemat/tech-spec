@@ -2,33 +2,31 @@ import type { ActionResult } from '../../types'
 import type { AstFactory } from '../../generators/js'
 import type { IAction, TechSpec } from '../../spec/types'
 import type { YamlLoader } from '../../loaders/yaml'
-import type { SpecFinder } from '../../spec/finder'
 import type { FsUtils, SpecUtils } from '../utils'
+import type { SpecCode } from '../../generators/types'
 
 export class GenDiffAction implements IAction {
     constructor (
         private readonly fsUtils: FsUtils,
         private readonly yamlLoader: YamlLoader,
         private readonly specUtils: SpecUtils,
-        private readonly specFinder: SpecFinder,
         private readonly astFactory: AstFactory
     ) {}
 
     run (
-        genType: 'validators',
-        pathToDir: string,
-        outputFile: string
+        specDir: string,
+        outputDir: string
     ): ActionResult {
-        pathToDir = this.fsUtils.toAbsolutePath(pathToDir)
-        outputFile = this.fsUtils.toAbsolutePath(outputFile)
-        if (!this.fsUtils.isDirExists(pathToDir)) {
+        specDir = this.fsUtils.toAbsolutePath(specDir)
+        outputDir = this.fsUtils.toAbsolutePath(outputDir)
+        if (!this.fsUtils.isDirExists(specDir)) {
             return {
                 isError: true,
                 message: 'Provided output directory does not exists'
             }
         }
-        const specArray = this.specFinder
-            .findFiles(pathToDir)
+        const specArray = this.fsUtils
+            .findSpecFiles(specDir)
             .map(this.fsUtils.readFile)
             .map(this.yamlLoader.load)
         if (specArray.length === 0) {
@@ -44,14 +42,22 @@ export class GenDiffAction implements IAction {
                 message: error
             }
         }
-        const specAst = this.astFactory.generateJSAstTreeFromSpecArray(
+        const generatedAst = this.astFactory.fromSpec(
             specArray as TechSpec[]
         )
-        const sourceCode = this.fsUtils.readFile(outputFile)
-        const sourceCodeAst = this.astFactory.generateJSAstTreeFromCode(
-            sourceCode
-        )
-        if (this.specUtils.isEqual(specAst, sourceCodeAst)) {
+        const specCode: SpecCode = this.fsUtils
+            .findCodeFiles(outputDir)
+            .reduce<Partial<SpecCode>>(
+                (obj, filepath) => {
+                    const code = this.fsUtils.readFile(filepath)
+                    const type = this.fsUtils.getTypeFromFilePath(filepath)
+                    obj[type] = code
+                    return obj
+                },
+                {}
+            ) as SpecCode
+        const sourceCodeAst = this.astFactory.fromCode(specCode)
+        if (this.specUtils.isEqual(generatedAst, sourceCodeAst)) {
             return {
                 isError: false,
                 message: 'Validators are consistent with spec'

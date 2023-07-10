@@ -1,10 +1,9 @@
 import type { ActionResult } from '../../types'
-import type { Node } from 'acorn'
 import type { CodeFactory, AstFactory } from '../../generators/js'
 import type { IAction, TechSpec } from '../../spec/types'
 import type { YamlLoader } from '../../loaders/yaml'
 import type { FsUtils, SpecUtils } from '../utils'
-import type { SpecFinder } from '../../spec/finder'
+import { getEntries } from '../../utils'
 
 export class GenerateAction implements IAction {
     constructor (
@@ -12,24 +11,22 @@ export class GenerateAction implements IAction {
         private readonly yamlLoader: YamlLoader,
         private readonly specUtils: SpecUtils,
         private readonly astFactory: AstFactory,
-        private readonly specFinder: SpecFinder,
         private readonly codeFactory: CodeFactory
     ) {}
 
     run (
-        genType: 'validators',
-        pathToDir: string,
-        outputFile: string
+        specDir: string,
+        outputDir: string
     ): ActionResult {
-        pathToDir = this.fsUtils.toAbsolutePath(pathToDir)
-        outputFile = this.fsUtils.toAbsolutePath(outputFile)
-        if (!this.fsUtils.isDirExists(pathToDir)) {
+        specDir = this.fsUtils.toAbsolutePath(specDir)
+        outputDir = this.fsUtils.toAbsolutePath(outputDir)
+        if (!this.fsUtils.isDirExists(specDir)) {
             return {
                 isError: true,
                 message: 'Provided output directory does not exists'
             }
         }
-        const specArray = this.specFinder.findFiles(pathToDir)
+        const specArray = this.fsUtils.findSpecFiles(specDir)
             .map(this.fsUtils.readFile)
             .map(this.yamlLoader.load)
         const error = this.specUtils.validateSpecArray(specArray)
@@ -39,11 +36,16 @@ export class GenerateAction implements IAction {
                 message: error
             }
         }
-        const ast = this.astFactory.generateJSAstTreeFromSpecArray(
+        const ast = this.astFactory.fromSpec(
             specArray as TechSpec[]
         )
-        const sourceCode = this.codeFactory.generate(ast as Node)
-        this.fsUtils.writeToFile(outputFile, sourceCode)
+        const specCode = this.codeFactory.generate(ast)
+        for (const [type, code] of getEntries(specCode)) {
+            this.fsUtils.writeToFile(
+                this.fsUtils.genCodeFileName(outputDir, type),
+                code
+            )
+        }
         return {
             isError: false,
             message: 'Code is successfully generated'

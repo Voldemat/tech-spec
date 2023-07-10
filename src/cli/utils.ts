@@ -5,6 +5,7 @@ import lodash from 'lodash'
 import { validateSpec } from '../spec/validator'
 import type { IAction, TechSpec } from '../spec/types'
 import { type Command } from 'commander'
+import { FILE_SPEC_EXTENSION } from '../types'
 
 export class FsUtils {
     isDirExists (pathToDir: string): boolean {
@@ -24,6 +25,37 @@ export class FsUtils {
             throw new Error('PWD End is not defined')
         }
         return path.join(process.env.PWD, relativePath)
+    }
+
+    getTypeFromFilePath (filepath: string): TechSpec['type'] {
+        return path.parse(filepath).name as TechSpec['type']
+    }
+
+    genCodeFileName (outpurDir: string, type: TechSpec['type']): string {
+        return path.join(outpurDir, type + '.ts')
+    }
+
+    findCodeFiles (pathToDir: string): string[] {
+        return this.findFiles(pathToDir, '.ts')
+    }
+
+    findSpecFiles (pathToDir: string): string[] {
+        return this.findFiles(pathToDir, FILE_SPEC_EXTENSION)
+    }
+
+    findFiles (pathToDir: string, endsWith: string): string[] {
+        let filePaths: string[] = []
+        fs.readdirSync(pathToDir).forEach(filePath => {
+            const fullPath = path.join(pathToDir, filePath)
+            const stat = fs.lstatSync(fullPath)
+            if (stat.isDirectory()) {
+                filePaths = filePaths.slice(filePath.indexOf(filePath), 1)
+                filePaths.push(...this.findFiles(fullPath, endsWith))
+            } else if (filePath.endsWith(endsWith)) {
+                filePaths.push(fullPath)
+            }
+        })
+        return filePaths
     }
 }
 export class SpecUtils {
