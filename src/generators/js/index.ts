@@ -64,16 +64,20 @@ export class AstFactory {
         }
     }
 
-    genThemesAstFile (themes: Theme[]): Record<string, any> {
+    genThemesAstFile (themes: Theme[]): Record<string, any> | null {
+        const themeAstBody = this.buildThemeAst(themes)
+        if (themeAstBody === null) {
+            return null
+        }
         return {
             type: 'Program',
-            body: [this.buildThemeAst(themes)],
+            body: [themeAstBody],
             sourceType: 'module'
         }
     }
 
-    buildThemeAst (themes: Theme[]): Record<string, any> {
-        if (themes.length < 1) return {}
+    buildThemeAst (themes: Theme[]): Record<string, any> | null {
+        if (themes.length < 1) return null
         return {
             type: 'ExportNamedDeclaration',
             declaration: {
@@ -251,8 +255,8 @@ export class CodeFactory {
         return getEntries(ast)
             .reduce<Partial<SpecCode>>(
                 (obj, [type, ast]) => {
-                    let code: string = ''
-                    if (Object.keys(ast).length !== 0) {
+                    let code: string | null = null
+                    if (ast !== null) {
                         code = astring.generate(ast as astring.Node)
                     }
                     obj[type] = code
