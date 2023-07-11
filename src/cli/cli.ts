@@ -8,6 +8,7 @@ import { validateCommand } from './commands/validate'
 import { ValidateAction } from './actions/validate'
 import { generateDiffCommand } from './commands/generateDiffCommand'
 import { GenDiffAction } from './actions/genDiff'
+import packageJson from '../../package.json'
 
 export class CLI {
     private readonly program: Command
@@ -19,6 +20,7 @@ export class CLI {
         codeFactory: CodeFactory
     ) {
         this.program = new Command()
+        this.program.version(packageJson.version)
         this.program.addCommand(
             generateCommand.action(
                 buildActionCallback(

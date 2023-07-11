@@ -2,9 +2,11 @@ import fs from 'fs'
 import path from 'path'
 import yaml from 'js-yaml'
 import lodash from 'lodash'
+import * as emojis from 'node-emoji'
+import chalk from 'chalk'
+import { type Command } from 'commander'
 import { validateSpec } from '../spec/validator'
 import type { IAction, TechSpec } from '../spec/types'
-import { type Command } from 'commander'
 import { FILE_SPEC_EXTENSION } from '../types'
 
 export class FsUtils {
@@ -81,14 +83,20 @@ export class SpecUtils {
     }
 }
 
+export function createErrorMessage (message: string): string {
+    return emojis.emojify(`🚨 ${chalk.redBright(message)}`)
+}
+export function createSuccessMessage (message: string): string {
+    return emojis.emojify(`❇️  ${chalk.greenBright(message)}`)
+}
 export function buildActionCallback (
     program: Command, action: IAction
 ): () => void {
     return (...args: any) => {
         const result = action.run(...args)
         if (result.isError) {
-            program.error(result.message)
+            program.error(createErrorMessage(result.message))
         }
-        console.log(result.message)
+        console.log(createSuccessMessage(result.message))
     }
 }
