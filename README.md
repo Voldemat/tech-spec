@@ -2,7 +2,7 @@
 
 ## Installation
 ```bash
-    npm install -g tech-spec
+npm install -g tech-spec
 ```
 
 ## Usage example
@@ -17,8 +17,9 @@ spec:
     check: rgba(255, 255, 255, 255)
 ```
 
-Command: ```bash
-    tech-spec generate tech-spec output
+Command:
+```bash
+tech-spec generate tech-spec output
 ```
 
 output/theme.ts
