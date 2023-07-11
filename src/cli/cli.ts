@@ -1,3 +1,4 @@
+import fs from 'fs'
 import { Command } from 'commander'
 import { generateCommand } from './commands/generate'
 import { buildActionCallback, type FsUtils, type SpecUtils } from './utils'
@@ -8,8 +9,9 @@ import { validateCommand } from './commands/validate'
 import { ValidateAction } from './actions/validate'
 import { generateDiffCommand } from './commands/generateDiffCommand'
 import { GenDiffAction } from './actions/genDiff'
-import packageJson from '../../package.json'
 import type { SpecValidator } from '../spec/validator'
+
+const packageJson = JSON.parse(fs.readFileSync('package.json', 'utf-8'))
 
 export class CLI {
     private readonly program: Command
