@@ -8,6 +8,7 @@ import { type Command } from 'commander'
 import { validateSpec } from '../spec/validator'
 import type { IAction, TechSpec } from '../spec/types'
 import { FILE_SPEC_EXTENSION } from '../types'
+import { Spinner } from 'cli-spinner'
 
 export class FsUtils {
     isDirExists (pathToDir: string): boolean {
@@ -83,6 +84,8 @@ export class SpecUtils {
     }
 }
 
+const spinner = new Spinner('Processing...')
+spinner.setSpinnerString('⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏')
 export function createErrorMessage (message: string): string {
     return emojis.emojify(`🚨 ${chalk.redBright(message)}`)
 }
@@ -93,7 +96,9 @@ export function buildActionCallback (
     program: Command, action: IAction
 ): () => void {
     return (...args: any) => {
+        spinner.start()
         const result = action.run(...args)
+        spinner.stop(true)
         if (result.isError) {
             program.error(createErrorMessage(result.message))
         }
