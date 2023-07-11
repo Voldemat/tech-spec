@@ -83,5 +83,16 @@ export const RegistrationForm = {
     errorMessage: null
   }
 };
+```
 
+In your client code:
+```typescript
+import { buildValidators, FormValidators, ValidatorError } from 'tech-spec'
+import { RegistrationForm } from '<output-dir>/form'
+
+const validators: FormValidators<typeof RegistrationForm> = buildValidators(RegistrationForm)
+const result: ValidatorError = validators.login('asd') // login has less characters than required in spec
+if (!result.isValid) {
+    throw new Error(result.errorMessage)
+}
 ```
