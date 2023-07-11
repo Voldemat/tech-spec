@@ -7,7 +7,7 @@ npm install -g tech-spec
 
 ## Usage example
 
-tech-spec/check.tech-spec.yaml
+tech-spec/light.theme.tech-spec.yaml
 ```yaml
 type: theme
 metadata:
@@ -15,6 +15,33 @@ metadata:
 spec:
   colors:
     check: rgba(255, 255, 255, 255)
+```
+tech-spec/registration.form.tech-spec.yaml
+```yaml
+type: form
+metadata:
+  name: Registration
+spec:
+  login:
+    required: true
+    regex: '^[\w_]{4,100}$'
+    errorMessage: null
+
+  password:
+    required: true
+    regex: '^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9]){5;150}$'
+    errorMessage: 'Invalid'
+
+  tel:
+    required: true
+    regex: '^\d{3}-\d{3}-\d{4}$'
+    errorMessage: 'Invalid'
+
+  name:
+      required: false
+      regex: '^([а-яА-ЯёЁa-zA-Z]+ [а-яА-ЯёЁa-zA-Z]? [а-яА-ЯёЁa-zA-Z]? [\-\s]*){1;150}$'
+      errorMessage: null
+
 ```
 
 Command:
@@ -31,4 +58,30 @@ export const design = {
     }
   }
 };
+```
+output/form.ts
+```typescript
+export const RegistrationForm = {
+  login: {
+    required: true,
+    regex: "^[\\w_]{4,100}$",
+    errorMessage: null
+  },
+  password: {
+    required: true,
+    regex: "^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9]){5;150}$",
+    errorMessage: "Invalid"
+  },
+  tel: {
+    required: true,
+    regex: "^\\d{3}-\\d{3}-\\d{4}$",
+    errorMessage: "Invalid"
+  },
+  name: {
+    required: false,
+    regex: "^([а-яА-ЯёЁa-zA-Z]+ [а-яА-ЯёЁa-zA-Z]? [а-яА-ЯёЁa-zA-Z]? [\\-\\s]*){1;150}$",
+    errorMessage: null
+  }
+};
+
 ```
