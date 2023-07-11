@@ -9,12 +9,14 @@ import { ValidateAction } from './actions/validate'
 import { generateDiffCommand } from './commands/generateDiffCommand'
 import { GenDiffAction } from './actions/genDiff'
 import packageJson from '../../package.json'
+import type { SpecValidator } from '../spec/validator'
 
 export class CLI {
     private readonly program: Command
     constructor (
         fsUtils: FsUtils,
         specUtils: SpecUtils,
+        specValidator: SpecValidator,
         yamlLoader: YamlLoader,
         astFactory: AstFactory,
         codeFactory: CodeFactory
@@ -28,7 +30,7 @@ export class CLI {
                     new GenerateAction(
                         fsUtils,
                         yamlLoader,
-                        specUtils,
+                        specValidator,
                         astFactory,
                         codeFactory
                     )
@@ -42,7 +44,7 @@ export class CLI {
                     new ValidateAction(
                         fsUtils,
                         yamlLoader,
-                        specUtils
+                        specValidator
                     )
                 )
             )
@@ -55,7 +57,8 @@ export class CLI {
                         fsUtils,
                         yamlLoader,
                         specUtils,
-                        astFactory
+                        astFactory,
+                        specValidator
                     )
                 )
             )
