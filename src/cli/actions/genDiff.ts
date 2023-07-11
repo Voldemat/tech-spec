@@ -1,16 +1,22 @@
-import type { ActionResult } from '../../types'
+import type {
+    ActionResult,
+    ILoaderErrorResult,
+    ILoaderSuccessResult
+} from '../../types'
 import type { AstFactory } from '../../generators/js'
 import type { IAction, TechSpec } from '../../spec/types'
 import type { YamlLoader } from '../../loaders/yaml'
 import type { FsUtils, SpecUtils } from '../utils'
 import type { SpecCode } from '../../generators/types'
+import type { SpecValidator } from '../../spec/validator'
 
 export class GenDiffAction implements IAction {
     constructor (
         private readonly fsUtils: FsUtils,
         private readonly yamlLoader: YamlLoader,
         private readonly specUtils: SpecUtils,
-        private readonly astFactory: AstFactory
+        private readonly astFactory: AstFactory,
+        private readonly specValidator: SpecValidator
     ) {}
 
     run (
@@ -22,24 +28,39 @@ export class GenDiffAction implements IAction {
         if (!this.fsUtils.isDirExists(specDir)) {
             return {
                 isError: true,
-                message: 'Provided spec directory does not exists'
+                messages: ['Provided spec directory does not exists']
             }
         }
-        const specArray = this.fsUtils
+        const parsingArray = this.fsUtils
             .findSpecFiles(specDir)
-            .map(this.fsUtils.readFile)
-            .map(this.yamlLoader.load)
-        if (specArray.length === 0) {
+            .map(filepath => this.yamlLoader.load(filepath))
+        if (parsingArray.length === 0) {
             return {
                 isError: true,
-                message: 'Provided directory doesn`t have any spec yaml files'
+                messages: [
+                    'Provided directory doesn`t have any spec yaml files'
+                ]
             }
         }
-        const error = this.specUtils.validateSpecArray(specArray)
-        if (error !== null) {
+        const parsingErrorsArray = parsingArray.filter(
+            (e): e is ILoaderErrorResult => e.error !== null
+        ).map(e => e.error)
+        if (parsingErrorsArray.length !== 0) {
             return {
                 isError: true,
-                message: error
+                messages: parsingErrorsArray
+            }
+        }
+        const specArray = (parsingArray as ILoaderSuccessResult[]).map(
+            (r) => r.data
+        )
+        const errors = specArray
+            .map(spec => this.specValidator.validate(spec))
+            .filter((e): e is string => e !== null)
+        if (errors.length !== 0) {
+            return {
+                isError: true,
+                messages: errors
             }
         }
         const generatedAst = this.astFactory.fromSpec(
@@ -60,12 +81,12 @@ export class GenDiffAction implements IAction {
         if (this.specUtils.isEqual(generatedAst, sourceCodeAst)) {
             return {
                 isError: false,
-                message: 'Validators are consistent with spec'
+                messages: ['Validators are consistent with spec']
             }
         }
         return {
             isError: true,
-            message: 'Validators are not consistent with spec'
+            messages: ['Validators are not consistent with spec']
         }
     }
 }

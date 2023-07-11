@@ -5,10 +5,11 @@ import { YamlLoader } from '../loaders/yaml'
 import { CLI } from './cli'
 import { FsUtils, SpecUtils } from './utils'
 
+const fsUtils = new FsUtils()
 const cli = new CLI(
-    new FsUtils(),
+    fsUtils,
     new SpecUtils(),
-    new YamlLoader(),
+    new YamlLoader(fsUtils),
     new AstFactory(),
     new CodeFactory()
 )

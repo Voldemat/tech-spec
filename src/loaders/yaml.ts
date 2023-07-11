@@ -1,8 +1,26 @@
-import { load } from 'js-yaml'
-import { type ILoader } from '../spec/types'
+import { load, type YAMLException } from 'js-yaml'
+import type { FsUtils } from '../cli/utils'
+import type { ILoaderResult, ILoader } from '../types'
 
 export class YamlLoader implements ILoader {
-    load (content: string): Record<string, any> {
-        return load(content) as Record<string, any>
+    constructor (private readonly fsUtils: FsUtils) {}
+    load (filepath: string): ILoaderResult {
+        const content = this.fsUtils.readFile(filepath)
+        try {
+            const data = load(content) as Record<string, any>
+            return {
+                data,
+                error: null
+            }
+        } catch (error: any) {
+            const e: YAMLException = error
+            return {
+                data: null,
+                error: (
+                    `YamlParsingError: ${filepath}\n\n` +
+                    `Reason: ${e.reason}\n\n${e.mark.snippet}`
+                )
+            }
+        }
     }
 }

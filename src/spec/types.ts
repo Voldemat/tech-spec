@@ -27,9 +27,6 @@ export interface Theme {
 }
 export type TechSpec = Form | Theme
 
-export interface ILoader {
-    load: (content: string) => Record<string, any>
-}
 export interface IAction {
     run: (...args: any) => ActionResult
 }

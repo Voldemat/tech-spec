@@ -1,11 +1,9 @@
 import fs from 'fs'
 import path from 'path'
-import yaml from 'js-yaml'
 import lodash from 'lodash'
 import * as emojis from 'node-emoji'
 import chalk from 'chalk'
 import { type Command } from 'commander'
-import { validateSpec } from '../spec/validator'
 import type { IAction, TechSpec } from '../spec/types'
 import { FILE_SPEC_EXTENSION } from '../types'
 import { Spinner } from 'cli-spinner'
@@ -66,16 +64,6 @@ export class FsUtils {
     }
 }
 export class SpecUtils {
-    validateSpecArray (data: Array<Record<string, any>>): string | null {
-        const errors = data.map(validateSpec).filter(e => e !== null)
-        if (errors.length === 0) { return null }
-        return JSON.stringify(errors, null, 4)
-    }
-
-    parseYaml (yamlString: string): TechSpec {
-        return yaml.load(yamlString) as TechSpec
-    }
-
     isEqual (
         spec1: Record<string, any>,
         spec2: Record<string, any>
@@ -86,11 +74,18 @@ export class SpecUtils {
 
 const spinner = new Spinner('Processing...')
 spinner.setSpinnerString('⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏')
-export function createErrorMessage (message: string): string {
-    return emojis.emojify(`🚨 ${chalk.redBright(message)}`)
+const msgDelimeter = chalk.whiteBright('\n' + '_'.repeat(40) + '\n\n')
+export function createErrorMessage (messages: string[]): string {
+    return messages
+        .map(
+            msg => emojis.emojify(`🚨 ${chalk.redBright(msg)}`)
+        )
+        .join(msgDelimeter)
 }
-export function createSuccessMessage (message: string): string {
-    return emojis.emojify(`❇️  ${chalk.greenBright(message)}`)
+export function createSuccessMessage (messages: string[]): string {
+    return messages
+        .map(msg => emojis.emojify(`❇️  ${chalk.greenBright(msg)}`))
+        .join(msgDelimeter)
 }
 export function buildActionCallback (
     program: Command, action: IAction
@@ -100,8 +95,8 @@ export function buildActionCallback (
         const result = action.run(...args)
         spinner.stop(true)
         if (result.isError) {
-            program.error(createErrorMessage(result.message))
+            program.error(createErrorMessage(result.messages))
         }
-        console.log(createSuccessMessage(result.message))
+        console.log(createSuccessMessage(result.messages))
     }
 }

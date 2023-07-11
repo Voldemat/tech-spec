@@ -1,21 +1,31 @@
-import Ajv, { type ErrorObject } from 'ajv'
+import Ajv, { type ValidateFunction } from 'ajv'
+import betterAjvErrors from 'better-ajv-errors'
 import { techSpecSchema } from './schema'
 
-const ajv = new Ajv({
-    useDefaults: true,
-    allErrors: true,
-    discriminator: true,
-    strict: false
-})
-const validateSchema = ajv.compile<boolean>(techSpecSchema)
-export function validateSpec (
-    data: Record<string, any>
-): Array<ErrorObject<string, Record<string, any>, unknown>> | null {
-    const isValid = validateSchema(data)
-    if (!isValid) {
-        return validateSchema.errors as Array<
-            ErrorObject<string, Record<string, any>, unknown>
-        >
+export class SpecValidator {
+    private readonly ajv: Ajv
+    private readonly schema: ValidateFunction<boolean>
+    constructor () {
+        this.ajv = new Ajv({
+            useDefaults: true,
+            allErrors: true,
+            discriminator: true,
+            strict: false,
+            verbose: true
+        })
+        this.schema = this.ajv.compile<boolean>(techSpecSchema)
     }
-    return null
+
+    validate (data: Record<string, any>): string | null {
+        const isValid = this.schema(data)
+        if (!isValid) {
+            if (this.schema.errors == null) {
+                throw new Error('this.schema.errors is null or undefined')
+            }
+            return betterAjvErrors(this.schema, data, this.schema.errors, {
+                indent: 4
+            })
+        }
+        return null
+    }
 }
