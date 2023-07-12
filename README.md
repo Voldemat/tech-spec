@@ -102,3 +102,31 @@ if (!result.isValid) {
     throw new Error(result.errorMessage)
 }
 ```
+
+
+## Yaml Parsing Errors Examples
+
+tech-spec/dark.theme.tech-spec.yaml
+```yaml
+type: theme
+metadata:
+  name: light
+  asdasd
+spec:
+  colors:
+    check: rgba(255, 255, 255, 255)
+```
+```bash
+tech-spec validate tech-spec
+```
+    🚨 YamlParsingError: tech-spec/light-theme.tech-spec.yaml
+
+    Reason: can not read an implicit mapping pair; a colon is missed
+
+    1 | type: theme
+    2 | metadata:
+    3 |   name: light
+    4 |   asd
+    ----------^
+    5 | spec:
+    6 |   colors:
