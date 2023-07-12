@@ -3,8 +3,11 @@ import * as astring from 'astring'
 import type { Form, FormFieldSpec, TechSpec, Theme } from '../../spec/types'
 import { getEntries } from '../../utils'
 import type { SpecCode, TechSpecAst } from '../types'
+import type { BaseAstFactory } from './base'
+import { nestedOmit } from './utils'
 
 export class AstFactory {
+    constructor (private readonly baseAstFactory: BaseAstFactory) {}
     fromCode (specCode: SpecCode): TechSpecAst {
         const specAst: Partial<TechSpecAst> = {}
         const specCodeEntries = (
@@ -15,7 +18,7 @@ export class AstFactory {
                 code,
                 { ecmaVersion: 7, ranges: false, sourceType: 'module' }
             )
-            const finalAst = this.nestedOmit(
+            const finalAst = nestedOmit(
                 codeAst,
                 [
                     'specifiers',
@@ -28,25 +31,6 @@ export class AstFactory {
             specAst[type] = finalAst
         })
         return specAst as TechSpecAst
-    }
-
-    nestedOmit (
-        obj: Record<string, any>, omitKeys: string[]
-    ): Record<string, any> {
-        const newObj: Record<string, any> = {}
-        Object.entries(obj).forEach(([key, value]: [string, any]) => {
-            if (omitKeys.includes(key)) {
-                return
-            }
-            if (value instanceof Array) {
-                newObj[key] = value.map((v) => this.nestedOmit(v, omitKeys))
-            } else if (value instanceof Object) {
-                newObj[key] = this.nestedOmit(value, omitKeys)
-            } else {
-                newObj[key] = value
-            }
-        })
-        return newObj
     }
 
     fromSpec (
@@ -75,40 +59,26 @@ export class AstFactory {
         if (themeAstBody === null) {
             return undefined
         }
-        return {
-            type: 'Program',
-            body: [themeAstBody],
-            sourceType: 'module'
-        }
+        return this.baseAstFactory.buildProgram([themeAstBody])
     }
 
     buildThemeAst (themes: Theme[]): Record<string, any> | null {
         if (themes.length < 1) return null
-        return {
-            type: 'ExportNamedDeclaration',
-            declaration: {
-                type: 'VariableDeclaration',
-                kind: 'const',
-                declarations: [
-                    {
-                        type: 'VariableDeclarator',
-                        id: {
-                            type: 'Identifier',
-                            name: 'design'
-                        },
-                        init: {
-                            type: 'ObjectExpression',
-                            properties: [this.buildThemeProperties(themes)]
-                        }
-                    }
-                ]
-            }
-        }
+        return this.baseAstFactory.buildExportDeclaration(
+            this.baseAstFactory.buildVariable(
+                'const',
+                'design',
+                this.baseAstFactory.buildObjectExpression(
+                    [this.buildThemeProperties(themes)]
+                )
+            )
+        )
     }
 
-    buildThemeProperties (themes: Theme[]): Record<string, any> {
-        const colors = Object.keys(themes[0].spec.colors)
-        const colorsObject = colors.reduce<
+    private buildThemeColorsObject (
+        themes: Theme[]
+    ): Record<string, Record<string, string>> {
+        return Object.keys(themes[0].spec.colors).reduce<
             Record<string, Record<string, string>>
         >(
             (obj, color) => {
@@ -117,52 +87,32 @@ export class AstFactory {
             },
             {}
         )
-        return {
-            type: 'Property',
-            method: false,
-            shorthand: false,
-            computed: false,
-            key: {
-                type: 'Identifier',
-                name: 'colors'
-            },
-            kind: 'init',
-            value: {
-                type: 'ObjectExpression',
-                properties: colors.map(color => ({
-                    type: 'Property',
-                    method: false,
-                    shorthand: false,
-                    computed: false,
-                    kind: 'init',
-                    key: {
-                        type: 'Identifier',
-                        name: color
-                    },
-                    value: {
-                        type: 'ObjectExpression',
-                        properties: getEntries(colorsObject[color])
-                            .map(([key, value]) => {
-                                return {
-                                    type: 'Property',
-                                    method: false,
-                                    computed: false,
-                                    shorthand: false,
-                                    key: {
-                                        type: 'Identifier',
-                                        name: key
-                                    },
-                                    kind: 'init',
-                                    value: {
-                                        type: 'Literal',
-                                        value
-                                    }
-                                }
-                            })
-                    }
-                }))
-            }
-        }
+    }
+
+    buildThemeProperties (themes: Theme[]): Record<string, any> {
+        const colorsObject = this.buildThemeColorsObject(themes)
+        return this.baseAstFactory.buildProperty(
+            'colors',
+            this.baseAstFactory.buildObjectExpression(
+                Object.keys(colorsObject).map(color => {
+                    return this.baseAstFactory.buildProperty(
+                        color,
+                        this.baseAstFactory.buildObjectExpression(
+                            getEntries(colorsObject[color])
+                                .map(([key, value]) => {
+                                    return this.baseAstFactory.buildProperty(
+                                        key,
+                                        {
+                                            type: 'Literal',
+                                            value
+                                        }
+                                    )
+                                })
+                        )
+                    )
+                })
+            )
+        )
     }
 
     buildThemeColorObject (
@@ -175,11 +125,9 @@ export class AstFactory {
     }
 
     genFormsAstFile (forms: Form[]): Record<string, any> {
-        return {
-            type: 'Program',
-            body: forms.map(form => this.genFormAst(form)),
-            sourceType: 'module'
-        }
+        return this.baseAstFactory.buildProgram(
+            forms.map(form => this.genFormAst(form))
+        )
     }
 
     genFormAst (form: Form): Record<string, any> {
@@ -195,65 +143,39 @@ export class AstFactory {
     buildFormAst (
         formName: string, fields: Array<[string, FormFieldSpec]>
     ): Record<string, any> {
-        return {
-            type: 'ExportNamedDeclaration',
-            declaration: {
-                type: 'VariableDeclaration',
-                kind: 'const',
-                declarations: [
-                    {
-                        type: 'VariableDeclarator',
-                        id: {
-                            type: 'Identifier',
-                            name: formName + 'Form'
-                        },
-                        init: {
-                            type: 'ObjectExpression',
-                            properties: fields.map(
-                                ([name, field]) => (
-                                    this.buildFormFieldAst(name, field)
-                                )
-                            )
-                        }
-                    }
-                ]
-            }
-        }
+        return this.baseAstFactory.buildExportDeclaration(
+            this.baseAstFactory.buildVariable(
+                'const',
+                formName + 'Form',
+                this.baseAstFactory.buildObjectExpression(
+                    fields.map(
+                        ([name, field]) => (
+                            this.buildFormFieldAst(name, field)
+                        )
+                    )
+                )
+            )
+        )
     }
 
     buildFormFieldAst (
         name: string, field: FormFieldSpec
     ): Record<string, any> {
         const fieldKeys = Object.keys(field) as Array<(keyof FormFieldSpec)>
-        return {
-            type: 'Property',
-            method: false,
-            shorthand: false,
-            computed: false,
-            key: {
-                type: 'Identifier',
-                name
-            },
-            kind: 'init',
-            value: {
-                type: 'ObjectExpression',
-                properties: fieldKeys.map(fieldKey => ({
-                    type: 'Property',
-                    method: false,
-                    shorthand: false,
-                    computed: false,
-                    key: {
-                        type: 'Identifier',
-                        name: fieldKey
-                    },
-                    value: {
-                        type: 'Literal',
-                        value: field[fieldKey]
-                    },
-                    kind: 'init'
-                }))
-            }
-        }
+        return this.baseAstFactory.buildProperty(
+            name,
+            this.baseAstFactory.buildObjectExpression(
+                fieldKeys.map(fieldKey => {
+                    return this.baseAstFactory.buildProperty(
+                        fieldKey,
+                        {
+                            type: 'Literal',
+                            value: field[fieldKey]
+                        }
+                    )
+                })
+            )
+        )
     }
 }
 export class CodeFactory {

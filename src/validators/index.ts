@@ -6,31 +6,33 @@ export interface ValidatorError {
   errorMessage: string | null
 }
 export type ValidatorFunc = (value: string | null) => ValidatorError
-export function buildValidator (spec: FormFieldSpec): ValidatorFunc {
+export const successValidatorResult: ValidatorError = {
+    isValid: true,
+    errorMessage: null
+}
+export function validateFormField (
+    spec: FormFieldSpec,
+    v: string | null
+): ValidatorError {
     const regex = new RegExp(spec.regex)
+    const errorResult: ValidatorError = {
+        isValid: false,
+        errorMessage: spec.errorMessage
+    }
+    if (v === null) {
+        if (spec.required) {
+            return errorResult
+        }
+        return successValidatorResult
+    }
+    if (!regex.test(v)) {
+        return errorResult
+    }
+    return successValidatorResult
+}
+export function buildValidator (spec: FormFieldSpec): ValidatorFunc {
     return (v: string | null) => {
-        if (v === null) {
-            if (spec.required) {
-                return {
-                    isValid: false,
-                    errorMessage: spec.errorMessage
-                }
-            }
-            return {
-                isValid: true,
-                errorMessage: null
-            }
-        }
-        if (!regex.test(v)) {
-            return {
-                isValid: false,
-                errorMessage: spec.errorMessage
-            }
-        }
-        return {
-            isValid: true,
-            errorMessage: null
-        }
+        return validateFormField(spec, v)
     }
 }
 export type FormValidators<T extends FormValidationSpec> = {

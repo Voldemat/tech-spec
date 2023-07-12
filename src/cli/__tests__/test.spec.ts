@@ -1,3 +1,4 @@
+/* eslint max-lines-per-function: 0 */
 import fs from 'fs'
 import os from 'os'
 import path from 'path'
