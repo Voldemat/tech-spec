@@ -106,7 +106,7 @@ if (!result.isValid) {
 
 ## Yaml Parsing Errors Examples
 
-tech-spec/dark.theme.tech-spec.yaml
+tech-spec/light.theme.tech-spec.yaml
 ```yaml
 type: theme
 metadata:
