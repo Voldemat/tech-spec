@@ -52,7 +52,7 @@ spec:
 
 Command:
 ```bash
-tech-spec generate tech-spec output
+techspec generate tech-spec output
 ```
 
 output/theme.ts
@@ -117,7 +117,7 @@ spec:
     check: rgba(255, 255, 255, 255)
 ```
 ```bash
-tech-spec validate tech-spec
+techspec validate tech-spec
 ```
 
     🚨 YamlParsingError: tech-spec/light-theme.tech-spec.yaml
