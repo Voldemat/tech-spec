@@ -22,6 +22,7 @@ export class FsUtils {
     }
 
     toAbsolutePath (relativePath: string): string {
+        if (relativePath.startsWith('/')) return relativePath
         if (process.env.PWD == null) {
             throw new Error('PWD End is not defined')
         }

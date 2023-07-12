@@ -7,7 +7,7 @@ import { CLI } from './cli'
 import { FsUtils, SpecUtils } from './utils'
 
 const fsUtils = new FsUtils()
-const cli = new CLI(
+export const cli = new CLI(
     fsUtils,
     new SpecUtils(),
     new SpecValidator(),
