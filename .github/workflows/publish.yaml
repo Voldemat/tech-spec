@@ -18,6 +18,8 @@ jobs:
       - name: lint
         run: npm run lint
       - name: test
+        env:
+          FORCE_COLOR: 1
         run: npm run test
       - name: build
         run: npm run build
