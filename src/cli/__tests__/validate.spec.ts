@@ -1,11 +1,12 @@
 /* eslint max-lines-per-function: 0 */
 import fs from 'fs'
+import { v4 as uuid4 } from 'uuid'
 import os from 'os'
 import path from 'path'
 import { runCLI } from './conftest'
 
 describe('CLI:validate', () => {
-    const techSpecFolder = path.join(os.tmpdir(), 'tech-spec')
+    const techSpecFolder = path.join(os.tmpdir(), 'tech-spec-' + uuid4())
     let themeYamlContent = `
     type: theme
     metadata:

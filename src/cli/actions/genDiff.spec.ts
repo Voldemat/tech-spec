@@ -25,7 +25,7 @@ describe('genDiffActon', () => {
         const result = action.run(pathToDir, outputDir)
         expect(result.isError).toBe(false)
         expect(result.messages).toStrictEqual(
-            ['Validators are consistent with spec']
+            ['Generated code is consistent with spec']
         )
         expect(astFactory.fromCode.mock.calls.length).toBe(1)
         expect(astFactory.fromSpec.mock.calls.length).toBe(1)

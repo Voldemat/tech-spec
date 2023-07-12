@@ -26,12 +26,12 @@ export class GenDiffAction implements IAction {
         if (this.specUtils.isEqual(generatedAst, sourceCodeAst)) {
             return {
                 isError: false,
-                messages: ['Validators are consistent with spec']
+                messages: ['Generated code is consistent with spec']
             }
         }
         return {
             isError: true,
-            messages: ['Validators are not consistent with spec']
+            messages: ['Generated code is not consistent with spec']
         }
     }
 }
