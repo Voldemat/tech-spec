@@ -55,6 +55,8 @@ Command:
 techspec generate tech-spec output
 ```
 
+    ❇️  Code is successfully generated
+
 output/theme.ts
 ```typescript
 export const design = {

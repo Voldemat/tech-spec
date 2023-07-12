@@ -172,12 +172,12 @@ export class SpecUtils {
         const errors = specArray.data
             .map(spec => this.specValidator.validate(spec))
             .filter((e): e is string => e !== null)
-        if (errors.length === 0) {
+        if (errors.length !== 0) {
             return {
                 ok: false,
                 data: {
-                    isError: false,
-                    messages: ['Spec is valid']
+                    isError: true,
+                    messages: errors
                 }
             }
         }

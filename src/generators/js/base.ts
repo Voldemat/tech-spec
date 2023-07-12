@@ -55,6 +55,7 @@ export class BaseAstFactory {
             method: false,
             shorthand: false,
             computed: false,
+            kind: 'init',
             key: {
                 type: 'Identifier',
                 name: key
