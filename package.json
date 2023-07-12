@@ -12,7 +12,7 @@
     "build": "tsc",
     "lint": "eslint --ext=ts .",
     "lint:fix": "eslint --fix --ext=ts .",
-    "test": "jest"
+    "test": "jest --coverage"
   },
   "bin": {
     "techspec": "./dist/cli/index.js"

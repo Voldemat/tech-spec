@@ -21,6 +21,10 @@ jobs:
         env:
           FORCE_COLOR: 1
         run: npm run test
+      - name: Upload coverage reports to Codecov
+        uses: codecov/codecov-action@v3
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
       - name: build
         run: npm run build
       - name: publish
