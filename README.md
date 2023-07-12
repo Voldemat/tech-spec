@@ -3,7 +3,7 @@
 ![CI](https://github.com/Voldemat/tech-spec/actions/workflows/publish.yaml/badge.svg)
 [![codecov](https://codecov.io/gh/Voldemat/tech-spec/branch/main/graph/badge.svg?token=8YG300JEWB)](https://codecov.io/gh/Voldemat/tech-spec)
 [![Maintainability](https://api.codeclimate.com/v1/badges/8a112c2fa15b633c018e/maintainability)](https://codeclimate.com/github/Voldemat/tech-spec/maintainability)
-[![dependency status](https://img.shields.io/librariesio/release/npm/decache?style=flat-square)](https://github.com/Voldemat/tech-spec/blob/main/package.json#L43)
+[![https://nodei.co/npm/tech-spec.png?downloads=true&downloadRank=true&stars=true](https://nodei.co/npm/tech-spec.png?downloads=true&downloadRank=true&stars=true)](https://www.npmjs.com/package/tech-spec)
 
 ## Installation
 ```bash
