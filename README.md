@@ -52,10 +52,9 @@ spec:
 
 Command:
 ```bash
-techspec generate tech-spec output
+$ techspec generate tech-spec output
+❇️  Code is successfully generated
 ```
-
-    ❇️  Code is successfully generated
 
 output/theme.ts
 ```typescript
