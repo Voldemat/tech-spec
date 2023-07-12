@@ -111,7 +111,7 @@ tech-spec/dark.theme.tech-spec.yaml
 type: theme
 metadata:
   name: light
-  asdasd
+  asd
 spec:
   colors:
     check: rgba(255, 255, 255, 255)
