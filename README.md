@@ -119,7 +119,7 @@ spec:
 ```bash
 tech-spec validate tech-spec
 ```
-<span style="color:red">
+
     🚨 YamlParsingError: tech-spec/light-theme.tech-spec.yaml
 
     Reason: can not read an implicit mapping pair; a colon is missed
@@ -131,4 +131,3 @@ tech-spec validate tech-spec
     ----------^
     5 | spec:
     6 |   colors:
-</span>
