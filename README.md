@@ -52,7 +52,7 @@ spec:
 
 Command:
 ```bash
-$ techspec generate tech-spec output
+techspec generate tech-spec output
 ❇️  Code is successfully generated
 ```
 
