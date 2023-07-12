@@ -1,6 +1,7 @@
 # Tech-Spec
 ![CI](https://github.com/Voldemat/tech-spec/actions/workflows/publish.yaml/badge.svg)
 [![codecov](https://codecov.io/gh/Voldemat/tech-spec/branch/main/graph/badge.svg?token=8YG300JEWB)](https://codecov.io/gh/Voldemat/tech-spec)
+[![Maintainability](https://api.codeclimate.com/v1/badges/8a112c2fa15b633c018e/maintainability)](https://codeclimate.com/github/Voldemat/tech-spec/maintainability)
 
 ## Installation
 ```bash
