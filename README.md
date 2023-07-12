@@ -3,6 +3,7 @@
 ![CI](https://github.com/Voldemat/tech-spec/actions/workflows/publish.yaml/badge.svg)
 [![codecov](https://codecov.io/gh/Voldemat/tech-spec/branch/main/graph/badge.svg?token=8YG300JEWB)](https://codecov.io/gh/Voldemat/tech-spec)
 [![Maintainability](https://api.codeclimate.com/v1/badges/8a112c2fa15b633c018e/maintainability)](https://codeclimate.com/github/Voldemat/tech-spec/maintainability)
+[![Test Coverage](https://api.codeclimate.com/v1/badges/8a112c2fa15b633c018e/test_coverage)](https://codeclimate.com/github/Voldemat/tech-spec/test_coverage)
 [![https://nodei.co/npm/tech-spec.png?downloads=true&downloadRank=true&stars=true](https://nodei.co/npm/tech-spec.png?downloads=true&downloadRank=true&stars=true)](https://www.npmjs.com/package/tech-spec)
 
 ## Installation
