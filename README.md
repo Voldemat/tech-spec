@@ -1,5 +1,5 @@
 # Tech-Spec
-![CI](https://github.com/Voldemat/tech-spec/actions/workflows/publish.yml/badge.svg)
+![CI](https://github.com/Voldemat/tech-spec/actions/workflows/publish.yaml/badge.svg)
 
 ## Installation
 ```bash
