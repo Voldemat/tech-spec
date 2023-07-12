@@ -1,10 +1,9 @@
 /* eslint max-lines-per-function: 0 */
 import fs from 'fs'
 import { v4 as uuid4 } from 'uuid'
-import util from 'util'
 import os from 'os'
 import path from 'path'
-import { runCLI } from './conftest'
+import { rmTrailingSlashes, runCLI } from './conftest'
 
 const themeYamlContent = `
 type: theme
@@ -44,7 +43,7 @@ spec:
 const formExpectedCode = `export const RegistrationForm = {
   login: {
     required: true,
-    regex: ` + util.inspect('"^[\\w_]{4,100}$"').slice(1).slice(0, -1) + `,
+    regex: ` + rmTrailingSlashes('"^[\\w_]{4,100}$"') + `,
     errorMessage: null
   },
   password: {
@@ -55,17 +54,17 @@ const formExpectedCode = `export const RegistrationForm = {
   tel: {
     required: true,
     regex: ` +
-    util.inspect('"^\\d{3}-\\d{3}-\\d{4}$"').slice(1).slice(0, -1) +
+    rmTrailingSlashes('"^\\d{3}-\\d{3}-\\d{4}$"') +
     `,
     errorMessage: "Invalid"
   },
   name: {
     required: false,
     regex: ` +
-    util.inspect(
+    rmTrailingSlashes(
         '"^([а-яА-ЯёЁa-zA-Z]+ [а-яА-ЯёЁa-zA-Z]? ' +
         '[а-яА-ЯёЁa-zA-Z]? [\\-\\s]*){1;150}$"'
-    ).slice(1).slice(0, -1) + `,
+    ) + `,
     errorMessage: null
   }
 };
