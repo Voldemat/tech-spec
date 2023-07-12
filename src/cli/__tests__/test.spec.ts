@@ -53,8 +53,8 @@ describe('CLI:validate', () => {
         expect(output.stdout).toBe('\u001b[2K\u001b[1G')
         expect(output.stderr).toBe(
             '🚨 \u001b[91mYamlParsingError: ' +
-            '/var/folders/gt/n64rgjdx27lfbwflrwm5xr3w0000gn/T/tech-spec/' +
-            'light-theme.tech-spec.yaml' +
+            techSpecFolder +
+            '/light-theme.tech-spec.yaml' +
             '\u001b[39m\n\u001b[91m\u001b[39m\n\u001b[91m' +
             'Reason: can not read an implicit mapping pair; a colon is missed' +
             '\u001b[39m\n\u001b[91m\u001b[39m\n\u001b[91m ' +
