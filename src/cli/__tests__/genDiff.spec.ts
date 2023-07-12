@@ -3,80 +3,14 @@ import fs from 'fs'
 import { v4 as uuid4 } from 'uuid'
 import os from 'os'
 import path from 'path'
-import { removeDir, rmTrailingSlashes, runCLI } from './conftest'
+import { removeDir, runCLI } from './conftest'
+import {
+    formExpectedCode,
+    formYamlContent,
+    themeExpectedCode,
+    themeYamlContent
+} from './snippets'
 
-const themeYamlContent = `
-type: theme
-metadata:
-    name: light
-spec:
-    colors:
-        check: rgba(255, 255, 255, 255)
-`
-const formYamlContent = `
-type: form
-metadata:
-  name: 'Registration'
-spec:
-  login:
-    required: true
-    regex: '^[\\w_]{4,100}$'
-    errorMessage: null
-
-  password:
-    required: true
-    regex: '^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9]){5;150}$'
-    errorMessage: 'Invalid'
-
-  tel:
-    required: true
-    regex: '^\\d{3}-\\d{3}-\\d{4}$'
-    errorMessage: 'Invalid'
-
-  name:
-      required: false
-      regex: ` +
-      '^([а-яА-ЯёЁa-zA-Z]+ [а-яА-ЯёЁa-zA-Z]? ' +
-      '[а-яА-ЯёЁa-zA-Z]? [\\-\\s]*){1;150}$' + `
-      errorMessage: null
-`
-const formExpectedCode = `export const RegistrationForm = {
-  login: {
-    required: true,
-    regex: ` + rmTrailingSlashes('"^[\\w_]{4,100}$"') + `,
-    errorMessage: null
-  },
-  password: {
-    required: true,
-    regex: "^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9]){5;150}$",
-    errorMessage: "Invalid"
-  },
-  tel: {
-    required: true,
-    regex: ` +
-    rmTrailingSlashes('"^\\d{3}-\\d{3}-\\d{4}$"') +
-    `,
-    errorMessage: "Invalid"
-  },
-  name: {
-    required: false,
-    regex: ` +
-    rmTrailingSlashes(
-        '"^([а-яА-ЯёЁa-zA-Z]+ [а-яА-ЯёЁa-zA-Z]? ' +
-        '[а-яА-ЯёЁa-zA-Z]? [\\-\\s]*){1;150}$"'
-    ) + `,
-    errorMessage: null
-  }
-};
-`
-const themeExpectedCode = `export const design = {
-  colors: {
-    check: {
-      light: "rgba(255, 255, 255, 255)"
-    }
-  }
-};
-`
 describe('CLI:gen-diff', () => {
     const techSpecFolder = path.join(os.tmpdir(), 'tech-spec-' + uuid4())
     const outputFolder = path.join(os.tmpdir(), 'tech-spec-output-' + uuid4())

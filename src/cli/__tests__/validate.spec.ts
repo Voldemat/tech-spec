@@ -3,7 +3,7 @@ import fs from 'fs'
 import { v4 as uuid4 } from 'uuid'
 import os from 'os'
 import path from 'path'
-import { runCLI } from './conftest'
+import { removeDir, runCLI } from './conftest'
 
 describe('CLI:validate', () => {
     const techSpecFolder = path.join(os.tmpdir(), 'tech-spec-' + uuid4())
@@ -25,9 +25,7 @@ describe('CLI:validate', () => {
         fs.mkdirSync(techSpecFolder)
     })
     afterAll(() => {
-        fs.rm(techSpecFolder, {
-            recursive: true
-        }, (e) => { if (e !== null) console.error(e) })
+        removeDir(techSpecFolder)
     })
     it('should return green "❇️ Spec is valid" message', async () => {
         saveThemeFile(themeYamlContent)
