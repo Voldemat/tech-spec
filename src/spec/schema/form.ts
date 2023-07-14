@@ -22,9 +22,19 @@ export const formScheme = {
                         errorMessage: {
                             type: 'string',
                             nullable: true
+                        },
+                        helperMessage: {
+                            type: 'string',
+                            nullable: true,
+                            default: null
                         }
                     },
-                    required: ['regex', 'errorMessage', 'required']
+                    required: [
+                        'regex',
+                        'errorMessage',
+                        'required',
+                        'helperMessage'
+                    ]
                 }
             }
         }

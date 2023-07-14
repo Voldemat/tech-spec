@@ -39,19 +39,22 @@ export const formExpectedCode = `export const RegistrationForm = {
   login: {
     required: true,
     regex: ` + rmTrailingSlashes('"^[\\w_]{4,100}$"') + `,
-    errorMessage: null
+    errorMessage: null,
+    helperMessage: null
   },
   password: {
     required: true,
     regex: "^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9]){5;150}$",
-    errorMessage: "Invalid"
+    errorMessage: "Invalid",
+    helperMessage: null
   },
   tel: {
     required: true,
     regex: ` +
     rmTrailingSlashes('"^\\d{3}-\\d{3}-\\d{4}$"') +
     `,
-    errorMessage: "Invalid"
+    errorMessage: "Invalid",
+    helperMessage: null
   },
   name: {
     required: false,
@@ -60,7 +63,8 @@ export const formExpectedCode = `export const RegistrationForm = {
         '"^([а-яА-ЯёЁa-zA-Z]+ [а-яА-ЯёЁa-zA-Z]? ' +
         '[а-яА-ЯёЁa-zA-Z]? [\\-\\s]*){1;150}$"'
     ) + `,
-    errorMessage: null
+    errorMessage: null,
+    helperMessage: null
   }
 };
 `
