@@ -105,12 +105,11 @@ export class FsUtils {
     }
 
     findFiles (pathToDir: string, endsWith: string): string[] {
-        let filePaths: string[] = []
+        const filePaths: string[] = []
         fs.readdirSync(pathToDir).forEach(filePath => {
             const fullPath = path.join(pathToDir, filePath)
             const stat = fs.lstatSync(fullPath)
             if (stat.isDirectory()) {
-                filePaths = filePaths.slice(filePath.indexOf(filePath), 1)
                 filePaths.push(...this.findFiles(fullPath, endsWith))
             } else if (filePath.endsWith(endsWith)) {
                 filePaths.push(fullPath)
