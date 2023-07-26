@@ -18,7 +18,7 @@ export const formScheme = {
                             type: 'boolean',
                             default: true
                         },
-                        regex: { type: 'string' },
+                        regex: { type: 'string', format: 'regex' },
                         errorMessage: {
                             type: 'string',
                             nullable: true

@@ -1,4 +1,5 @@
 import Ajv, { type ValidateFunction } from 'ajv'
+import addFormats from 'ajv-formats'
 import betterAjvErrors from 'better-ajv-errors'
 import { techSpecSchema } from './schema'
 
@@ -13,6 +14,7 @@ export class SpecValidator {
             strict: false,
             verbose: true
         })
+        addFormats(this.ajv)
         this.schema = this.ajv.compile<boolean>(techSpecSchema)
     }
 

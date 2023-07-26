@@ -31,6 +31,7 @@
     "@types/jest": "^29.5.2",
     "acorn": "^8.10.0",
     "ajv": "^8.12.0",
+    "ajv-formats": "^2.1.1",
     "astring": "^1.8.6",
     "better-ajv-errors": "^1.2.0",
     "chalk": "^4.1.2",
