@@ -2,12 +2,17 @@ name: "lint & test & publish"
 
 on:
   push:
+    paths:
+      - packages/js
+      - schema/schema.json
     paths-ignore:
-       - 'README.md'
+      - 'README.md'
 
 jobs:
   main:
     runs-on: ubuntu-latest
+    env:
+      working-directory: ./packages/js
     steps:
       - name: checkout
         uses: actions/checkout@v2
@@ -17,24 +22,31 @@ jobs:
           node-version: 20
           registry-url: https://registry.npmjs.org
       - name: install
+        working-directory: ${{env.working-directory}}
         run: npm ci
       - name: lint
+        working-directory: ${{env.working-directory}}
         run: npm run lint
       - name: test
+        working-directory: ${{env.working-directory}}
         env:
           FORCE_COLOR: 1
         run: npm run test:coverage
       - name: Upload coverage reports to Codecov
+        working-directory: ${{env.working-directory}}
         uses: codecov/codecov-action@v3
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
       - name: Upload coverage reports to CodeClimate
         uses: paambaati/codeclimate-action@v5.0.0
+        working-directory: ${{env.working-directory}}
         env:
           CC_TEST_REPORTER_ID: ${{secrets.CODE_CLIMATE_TOKEN}}
       - name: build
+        working-directory: ${{env.working-directory}}
         run: npm run build
       - name: publish
+        working-directory: ${{env.working-directory}}
         if: ${{ github.ref_type == 'tag' }}
         run: npm publish --access public
         env:

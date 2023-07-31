@@ -1,7 +1,7 @@
 import Ajv, { type ValidateFunction } from 'ajv'
 import addFormats from 'ajv-formats'
 import betterAjvErrors from 'better-ajv-errors'
-import { techSpecSchema } from './schema'
+import techSpecSchema from '../schema.json'
 
 export class SpecValidator {
     private readonly ajv: Ajv
