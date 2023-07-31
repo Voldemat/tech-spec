@@ -1,4 +1,4 @@
-name: "lint & test & publish"
+name: "packages.js"
 
 on:
   push:

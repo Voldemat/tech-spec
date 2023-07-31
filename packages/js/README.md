@@ -1,6 +1,6 @@
 # Tech-Spec
 [![npm version](https://badge.fury.io/js/tech-spec.svg)](https://badge.fury.io/js/tech-spec)
-![CI](https://github.com/Voldemat/tech-spec/actions/workflows/publish.yaml/badge.svg)
+![CI](https://github.com/Voldemat/tech-spec/actions/workflows/packages.js.yaml/badge.svg)
 [![codecov](https://codecov.io/gh/Voldemat/tech-spec/branch/main/graph/badge.svg?token=8YG300JEWB)](https://codecov.io/gh/Voldemat/tech-spec)
 [![Maintainability](https://api.codeclimate.com/v1/badges/8a112c2fa15b633c018e/maintainability)](https://codeclimate.com/github/Voldemat/tech-spec/maintainability)
 [![Test Coverage](https://api.codeclimate.com/v1/badges/8a112c2fa15b633c018e/test_coverage)](https://codeclimate.com/github/Voldemat/tech-spec/test_coverage)
