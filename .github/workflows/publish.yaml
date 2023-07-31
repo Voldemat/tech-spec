@@ -31,13 +31,15 @@ jobs:
           FORCE_COLOR: 1
         run: npm run test:coverage
       - name: Upload coverage reports to Codecov
-        working-directory: ${{env.working-directory}}
         uses: codecov/codecov-action@v3
+        with:
+          directory: packages/js
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
       - name: Upload coverage reports to CodeClimate
         uses: paambaati/codeclimate-action@v5.0.0
-        working-directory: ${{env.working-directory}}
+        with:
+          workingDirectory: packages/js
         env:
           CC_TEST_REPORTER_ID: ${{secrets.CODE_CLIMATE_TOKEN}}
       - name: build
