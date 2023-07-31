@@ -5,6 +5,7 @@ on:
     paths:
       - packages/js/**
       - schema/schema.json
+      - .github/workflows/publish.yaml
 jobs:
   main:
     runs-on: ubuntu-latest
