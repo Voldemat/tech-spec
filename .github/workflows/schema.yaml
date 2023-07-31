@@ -1,0 +1,25 @@
+name: 'schema'
+
+on:
+  push:
+    paths:
+      - schema/**
+      - .github/workflows/schema.yaml
+jobs:
+  main:
+    runs-on: ubuntu-latest
+    env:
+      working-directory: './schema'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: node
+        uses: actions/setup-node@v2
+        with:
+          node-version: 20
+          registry-url: https://registry.npmjs.org
+      - name: Install ajv-cli
+        run: npm install -g ajv-cli
+      - name: Validate schema
+        working-directory: ${{env.working-directory}}
+        run: ajv compile -s './*.json' --strict=false

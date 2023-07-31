@@ -1,11 +1,12 @@
 name: "packages.js"
 
 on:
+  workflow_run:
+    workflows: ['schema']
   push:
     paths:
       - packages/js/**
-      - schema/schema.json
-      - .github/workflows/publish.yaml
+      - .github/workflows/packages.js.yaml
 jobs:
   main:
     runs-on: ubuntu-latest
