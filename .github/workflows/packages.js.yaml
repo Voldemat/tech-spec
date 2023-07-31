@@ -1,7 +1,10 @@
 name: "packages.js"
 
 on:
-  workflow_dispatch:
+  workflow_run:
+    workflows: ['schema']
+    types:
+      - completed
   push:
     paths:
       - packages/js/**

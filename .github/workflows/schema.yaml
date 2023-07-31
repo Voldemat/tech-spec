@@ -1,8 +1,6 @@
 name: 'schema'
 
 on:
-  workflow_run:
-    workflows: ['packages.js']
   push:
     paths:
       - schema/**
