@@ -3,7 +3,7 @@ name: "lint & test & publish"
 on:
   push:
     paths:
-      - packages/js
+      - packages/js/**
       - schema/schema.json
     paths-ignore:
       - 'README.md'
