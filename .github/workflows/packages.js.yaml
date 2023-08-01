@@ -1,10 +1,6 @@
 name: "packages.js"
 
 on:
-  workflow_run:
-    workflows: ['schema']
-    types:
-      - completed
   push:
     paths:
       - packages/js/**
@@ -22,6 +18,8 @@ jobs:
         with:
           node-version: 20
           registry-url: https://registry.npmjs.org
+      - name: Validate schema
+        run: npm run schema:validate
       - name: install
         working-directory: ${{env.working-directory}}
         run: npm ci

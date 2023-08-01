@@ -13,7 +13,11 @@
     "lint": "eslint --ext=ts .",
     "lint:fix": "eslint --fix --ext=ts .",
     "test": "jest",
-    "test:coverage": "jest --coverage"
+    "test:coverage": "jest --coverage",
+    "schema:update": "cp ../../schema/schema.json ./src/schema.json",
+    "schema:validate": "if test $(npm run --silent schema:global:hash) = $(npm run --silent schema:hash);then echo 'Schema is up to date'; exit 0; else echo 'Schema is outdated'; exit 1; fi",
+    "schema:hash": "cat ./src/schema.json | sha256sum | cut -d \" \" -f 1",
+    "schema:global:hash": "cat ../../schema/schema.json | sha256sum | cut -d \" \" -f 1"
   },
   "bin": {
     "techspec": "./dist/cli/index.js"
