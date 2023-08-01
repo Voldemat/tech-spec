@@ -1,0 +1,1 @@
+cp ../../schema/schema.json ./techspec/schema.json

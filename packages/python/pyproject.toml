@@ -1,0 +1,9 @@
+[tool.black]
+line-length=79
+exclude=''
+
+[tool.pytest.ini_options]
+log_cli_level = "DEBUG"
+
+[tool.mypy]
+strict=true
