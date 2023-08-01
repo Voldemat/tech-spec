@@ -19,6 +19,7 @@ jobs:
           node-version: 20
           registry-url: https://registry.npmjs.org
       - name: Validate schema
+        working-directory: ${{env.working-directory}}
         run: npm run schema:validate
       - name: install
         working-directory: ${{env.working-directory}}
