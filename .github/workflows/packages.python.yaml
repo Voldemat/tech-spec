@@ -33,7 +33,10 @@ jobs:
           mypy --color --pretty .
       - name: Test
         working-directory: ${{env.working-directory}}
-        run: coverage run -m pytest --color=yes .
+        run: |
+          coverage run -m pytest --color=yes .
+          coverage xml
+          coverage report -m
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v3
         with:
