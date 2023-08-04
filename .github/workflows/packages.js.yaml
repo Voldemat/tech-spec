@@ -50,6 +50,8 @@ jobs:
       - name: publish
         working-directory: ${{env.working-directory}}
         if: ${{ github.ref_type == 'tag' }}
-        run: npm publish --access public
+        run: |
+          npm version $GITHUB_REF_NAME
+          npm publish --access public
         env:
           NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
