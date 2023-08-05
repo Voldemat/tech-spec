@@ -11,6 +11,7 @@ setup(
     author="Vladimir Vojtenko",
     author_email="vladimirdev635@gmail.com",
     license="MIT",
+    install_requires=["typer[all]", "pyyaml", "jsonschema"],
     packages=find_packages(exclude=["__tests__*"]),
     include_package_data=True,
     long_description=(Path(__file__).parent / "README.md").read_text(),
