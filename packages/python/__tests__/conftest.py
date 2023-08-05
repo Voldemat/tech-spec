@@ -8,7 +8,7 @@ import pytest
 
 def run_cli(args: list[str]) -> subprocess.CompletedProcess[str]:
     return subprocess.run(
-        ["python3", ".", *args],
+        ["python3", "-m", "techspec", *args],
         capture_output=True,
         text=True,
     )
