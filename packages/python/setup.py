@@ -15,4 +15,5 @@ setup(
     include_package_data=True,
     long_description=(Path(__file__).parent / "README.md").read_text(),
     long_description_content_type="text/markdown",
+    entry_points={"console_scripts": ["techspecpy=techspec.cli:cli_main"]},
 )
