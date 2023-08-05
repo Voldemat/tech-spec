@@ -4,6 +4,9 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
+typer = {extras = ["all"], version = "*"}
+pyyaml = "*"
+jsonschema = "*"
 
 [dev-packages]
 black = "*"
@@ -13,6 +16,8 @@ pytest = "*"
 mypy = "*"
 ipython = "*"
 coverage = "*"
+types-pyyaml = "*"
+types-jsonschema = "*"
 
 [requires]
 python_version = "3.11"
