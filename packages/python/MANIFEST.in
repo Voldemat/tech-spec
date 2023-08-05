@@ -1,2 +1,1 @@
-recursive-include techspec py.typed
-include techspec/cli/schema.json
+recursive-include techspec py.typed schema.json
