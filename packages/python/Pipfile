@@ -7,6 +7,7 @@ name = "pypi"
 typer = {extras = ["all"], version = "*"}
 pyyaml = "*"
 jsonschema = "*"
+dependency-injector = "*"
 
 [dev-packages]
 black = "*"
