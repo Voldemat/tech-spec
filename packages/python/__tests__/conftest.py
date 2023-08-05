@@ -18,3 +18,6 @@ def run_cli(args: list[str]) -> subprocess.CompletedProcess[str]:
 def tmpdir() -> Generator[Path, None, None]:
     with tempfile.TemporaryDirectory() as path:
         yield Path(path)
+
+
+tmpdir2 = tmpdir

@@ -30,7 +30,13 @@ class SchemaService:
                     type=data["type"],
                     metadata=FormMetadataDTO(name=data["metadata"]["name"]),
                     spec={
-                        k: FormFieldDTO(**v) for k, v in data["spec"].items()
+                        k: FormFieldDTO(
+                            required=v["required"],
+                            regex=v["regex"],
+                            helper_message=v["helperMessage"],
+                            error_message=v["errorMessage"],
+                        )
+                        for k, v in data["spec"].items()
                     },
                 )
             case "theme":

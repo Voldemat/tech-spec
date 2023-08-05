@@ -23,8 +23,8 @@ class FormMetadataDTO:
 class FormFieldDTO:
     required: bool
     regex: re.Pattern[str]
-    errorMessage: str | None
-    helperMessage: str | None
+    error_message: str | None
+    helper_message: str | None
 
 
 @dataclass

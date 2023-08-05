@@ -1,0 +1,2 @@
+class OutputDirectoryDoesNotExists(BaseException):
+    pass

@@ -7,3 +7,7 @@ log_cli_level = "DEBUG"
 
 [tool.mypy]
 strict=true
+
+[[tool.mypy.overrides]]
+module='astor.*'
+ignore_missing_imports=true

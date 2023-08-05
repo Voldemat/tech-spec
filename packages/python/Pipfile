@@ -8,6 +8,7 @@ typer = {extras = ["all"], version = "*"}
 pyyaml = "*"
 jsonschema = "*"
 dependency-injector = "*"
+astor = "*"
 
 [dev-packages]
 black = "*"
