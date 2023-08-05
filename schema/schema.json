@@ -38,12 +38,10 @@
                                     "format": "regex"
                                 },
                                 "errorMessage": {
-                                    "type": "string",
-                                    "nullable": true
+                                    "type": ["string", "null"]
                                 },
                                 "helperMessage": {
-                                    "type": "string",
-                                    "nullable": true,
+                                    "type": ["string", "null"],
                                     "default": null
                                 }
                             },
