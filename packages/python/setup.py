@@ -13,6 +13,7 @@ setup(
     license="MIT",
     install_requires=[
         "typer[all]",
+        "astor",
         "pyyaml",
         "jsonschema",
         "dependency-injector",
