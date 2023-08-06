@@ -43,7 +43,7 @@ def validate_action(
     except GeneratorService.exc.OutputDirectoryDoesNotExists:
         stderr.print("Provided code directory does not exists")
         raise typer.Exit(1)
-
+    spec.themes = []
     if spec != code_spec:
         stderr.print("Code is not sync with schema")
         raise typer.Exit(1)
