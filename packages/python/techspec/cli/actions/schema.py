@@ -1,3 +1,4 @@
+import json
 from pathlib import Path
 
 from dependency_injector.wiring import Provide, inject
@@ -30,3 +31,11 @@ def validate_action(
     ) as exc:
         stderr.print("\n".join(exc.errors))
         raise typer.Exit(1)
+
+
+@inject
+def get_spec_action(
+    spec_dir: Path,
+) -> None:
+    spec = validate_action(spec_dir)
+    print(json.dumps(spec, indent=4, default=lambda v: v.__dict__))

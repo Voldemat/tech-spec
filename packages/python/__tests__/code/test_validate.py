@@ -27,6 +27,5 @@ def test_validate(tmpdir: Path, tmpdir2: Path) -> None:
         )
     )
     process = run_cli(["code", "validate", str(tmpdir), str(tmpdir2)])
-    print(process.stdout)
     assert process.returncode == 0, process.stderr
     assert process.stdout == "Code is in sync with schema\n"

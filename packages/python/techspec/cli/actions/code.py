@@ -1,3 +1,4 @@
+import json
 from pathlib import Path
 
 from dependency_injector.wiring import Provide, inject
@@ -32,15 +33,15 @@ def generate_action(
 @inject
 def validate_action(
     spec_dir: Path,
-    output_dir: Path,
+    code_dir: Path,
     stderr: Console = Provide[CLIContainer.stderr],
     generator: GeneratorService = Provide[CLIContainer.generator],
 ) -> None:
     spec = schema_validation_action(spec_dir)
     try:
-        code_spec = generator.get_techspec(output_dir)
+        code_spec = generator.get_techspec(code_dir)
     except GeneratorService.exc.OutputDirectoryDoesNotExists:
-        stderr.print("Provided output directory does not exists")
+        stderr.print("Provided code directory does not exists")
         raise typer.Exit(1)
 
     if spec != code_spec:
@@ -48,3 +49,17 @@ def validate_action(
         raise typer.Exit(1)
 
     print("Code is in sync with schema")
+
+
+@inject
+def get_spec_action(
+    code_dir: Path,
+    stderr: Console = Provide[CLIContainer.stderr],
+    generator: GeneratorService = Provide[CLIContainer.generator],
+) -> None:
+    try:
+        code_spec = generator.get_techspec(code_dir)
+        print(json.dumps(code_spec, indent=4, default=lambda v: v.__dict__))
+    except GeneratorService.exc.OutputDirectoryDoesNotExists:
+        stderr.print("Provided code directory does not exists")
+        raise typer.Exit(1)
