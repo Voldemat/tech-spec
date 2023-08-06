@@ -24,6 +24,8 @@ def generate_action(
         output_dir.mkdir(parents=True)
     with open(output_dir / "forms.py", "w+") as file:
         file.write(code.forms)
+    with open(output_dir / "__init__.py", "w+") as file:
+        pass
     print("Code generated successfully")
 
 
