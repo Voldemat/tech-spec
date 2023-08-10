@@ -5,21 +5,23 @@ import os from 'os'
 import path from 'path'
 import { removeDir, runCLI } from './conftest'
 import {
+    designSystemContent,
+    designSystemExpectedCode,
     formExpectedCode,
     formYamlContent,
-    themeExpectedCode,
-    themeYamlContent
+    loginFieldContent,
+    passwordFieldContent
 } from './snippets'
 
 describe('CLI:gen-diff', () => {
     const techSpecFolder = path.join(os.tmpdir(), 'tech-spec-' + uuid4())
     const outputFolder = path.join(os.tmpdir(), 'tech-spec-output-' + uuid4())
-    const formPath = path.join(outputFolder, 'form.ts')
-    const themePath = path.join(outputFolder, 'theme.ts')
+    const formPath = path.join(outputFolder, 'forms.ts')
+    const designSystemsPath = path.join(outputFolder, 'designs.ts')
 
-    function saveThemeFile (content: string): void {
+    function saveDesignSystemFile (content: string): void {
         fs.writeFileSync(
-            path.join(techSpecFolder, 'light-theme.tech-spec.yaml'),
+            path.join(techSpecFolder, 'main-design.tech-spec.yaml'),
             content
         )
     }
@@ -30,11 +32,23 @@ describe('CLI:gen-diff', () => {
             content
         )
     }
+    function saveLoginFieldFile (content: string): void {
+        fs.writeFileSync(
+            path.join(techSpecFolder, 'login.tech-spec.yaml'),
+            content
+        )
+    }
+    function savePasswordFieldFile (content: string): void {
+        fs.writeFileSync(
+            path.join(techSpecFolder, 'password.tech-spec.yaml'),
+            content
+        )
+    }
     function saveFormCodeFile (content: string): void {
         fs.writeFileSync(formPath, content)
     }
-    function saveThemeCodeFile (content: string): void {
-        fs.writeFileSync(themePath, content)
+    function saveDesignSystemCodeFile (content: string): void {
+        fs.writeFileSync(designSystemsPath, content)
     }
     beforeAll(() => {
         fs.mkdirSync(techSpecFolder)
@@ -48,10 +62,12 @@ describe('CLI:gen-diff', () => {
         'should return green ' +
         '"❇️ Generated code is consistent with spec" message',
         async () => {
-            saveThemeFile(themeYamlContent)
+            saveDesignSystemFile(designSystemContent)
             saveFormFile(formYamlContent)
             saveFormCodeFile(formExpectedCode)
-            saveThemeCodeFile(themeExpectedCode)
+            saveDesignSystemCodeFile(designSystemExpectedCode)
+            saveLoginFieldFile(loginFieldContent)
+            savePasswordFieldFile(passwordFieldContent)
             const output = await runCLI(
                 `gen-diff ${techSpecFolder} ${outputFolder}`
             )

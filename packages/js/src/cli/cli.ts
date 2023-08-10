@@ -2,7 +2,7 @@ import fs from 'fs'
 import path from 'path'
 import { Command } from 'commander'
 import { generateCommand } from './commands/generate'
-import { buildActionCallback, type FsUtils, type SpecUtils } from './utils'
+import { buildActionCallback, type SpecUtils } from './utils'
 import type { YamlLoader } from '../loaders/yaml'
 import type { AstFactory, CodeFactory } from '../generators/js'
 import { GenerateAction } from './actions/generate'
@@ -12,6 +12,8 @@ import { generateDiffCommand } from './commands/generateDiffCommand'
 import { GenDiffAction } from './actions/genDiff'
 import type { SpecValidator } from '../spec/validator'
 import type { IAction } from '../spec/types'
+import type { CodeToSpecGenerator } from '../generators/js/specGenerator'
+import type { FsUtils } from './fsUtils'
 
 const packageJson = JSON.parse(
     fs.readFileSync(
@@ -27,6 +29,7 @@ export interface CLIContainer {
     yamlLoader: YamlLoader
     astFactory: AstFactory
     codeFactory: CodeFactory
+    specGenerator: CodeToSpecGenerator
 }
 
 export class CLI {
@@ -56,7 +59,8 @@ export class CLI {
         return new GenDiffAction(
             container.fsUtils,
             container.specUtils,
-            container.astFactory
+            container.astFactory,
+            container.specGenerator
         )
     }
 

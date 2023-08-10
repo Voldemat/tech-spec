@@ -7,17 +7,18 @@ import { removeDir, runCLI } from './conftest'
 
 describe('CLI:validate', () => {
     const techSpecFolder = path.join(os.tmpdir(), 'tech-spec-' + uuid4())
-    let themeYamlContent = `
-    type: theme
+    let designSystemYamlContent = `
+    type: DesignSystem
     metadata:
-        name: light
+        name: main
     spec:
         colors:
-            check: rgba(255, 255, 255, 255)
+            check:
+                light: rgba(255, 255, 255, 255)
     `
-    function saveThemeFile (content: string): void {
+    function saveDesignSystemFile (content: string): void {
         fs.writeFileSync(
-            path.join(techSpecFolder, 'light-theme.tech-spec.yaml'),
+            path.join(techSpecFolder, 'main-design.tech-spec.yaml'),
             content
         )
     }
@@ -28,7 +29,7 @@ describe('CLI:validate', () => {
         removeDir(techSpecFolder)
     })
     it('should return green "❇️ Spec is valid" message', async () => {
-        saveThemeFile(themeYamlContent)
+        saveDesignSystemFile(designSystemYamlContent)
         const output = await runCLI(`validate ${techSpecFolder}`)
         expect(output.failed).toBe(false)
         expect(output.exitCode).toBe(0)
@@ -37,16 +38,17 @@ describe('CLI:validate', () => {
         )
     })
     it('Should return YamlParsingError', async () => {
-        themeYamlContent = `
-        type: theme
+        designSystemYamlContent = `
+        type: DesignSystem
         metadata:
-            name: light
+            name: main
             adsasd
         spec:
             colors:
-                check: rgba(255, 255, 255, 255)
+                check:
+                    light: rgba(255, 255, 255, 255)
         `
-        saveThemeFile(themeYamlContent)
+        saveDesignSystemFile(designSystemYamlContent)
         const output = await runCLI(`validate ${techSpecFolder}`)
         expect(output.failed).toBe(true)
         expect(output.exitCode).toBe(1)
@@ -54,13 +56,13 @@ describe('CLI:validate', () => {
         expect(output.stderr).toBe(
             '🚨 \u001b[91mYamlParsingError: ' +
             techSpecFolder +
-            '/light-theme.tech-spec.yaml' +
+            '/main-design.tech-spec.yaml' +
             '\u001b[39m\n\u001b[91m\u001b[39m\n\u001b[91m' +
             'Reason: can not read an implicit mapping pair; a colon is missed' +
             '\u001b[39m\n\u001b[91m\u001b[39m\n\u001b[91m ' +
-            '2 |         type: theme\u001b[39m\n\u001b[91m ' +
+            '2 |         type: DesignSystem\u001b[39m\n\u001b[91m ' +
             '3 |         metadata:\u001b[39m\n\u001b[91m ' +
-            '4 |             name: light\u001b[39m\n\u001b[91m ' +
+            '4 |             name: main\u001b[39m\n\u001b[91m ' +
             '5 |             adsasd\u001b[39m\n\u001b[91m' +
             '-----------------------^\u001b[39m\n\u001b[91m ' +
             '6 |         spec:\u001b[39m\n\u001b[91m ' +

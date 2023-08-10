@@ -1,12 +1,13 @@
 import { rmTrailingSlashes } from './conftest'
 
-export const themeYamlContent = `
-type: theme
+export const designSystemContent = `
+type: DesignSystem
 metadata:
-    name: light
+    name: main
 spec:
     colors:
-        check: rgba(255, 255, 255, 255)
+        check:
+            light: rgba(255, 255, 255, 255)
 `
 export const formYamlContent = `
 type: form
@@ -15,64 +16,55 @@ metadata:
 spec:
   login:
     required: true
-    regex: '^[\\w_]{4,100}$'
+    fieldRef: login
     errorMessage: null
 
   password:
+    fieldRef: password
     required: true
-    regex: '^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9]){5;150}$'
     errorMessage: 'Invalid'
-
-  tel:
-    required: true
-    regex: '^\\d{3}-\\d{3}-\\d{4}$'
-    errorMessage: 'Invalid'
-
-  name:
-      required: false
-      regex: ` +
-      '^([а-яА-ЯёЁa-zA-Z]+ [а-яА-ЯёЁa-zA-Z]? ' +
-      '[а-яА-ЯёЁa-zA-Z]? [\\-\\s]*){1;150}$' + `
-      errorMessage: null
 `
 export const formExpectedCode = `export const RegistrationForm = {
   login: {
     required: true,
-    regex: ` + rmTrailingSlashes('"^[\\w_]{4,100}$"') + `,
+    fieldRef: "login",
     errorMessage: null,
-    helperMessage: null
+    helperMessage: null,
+    field: {"type":"string","regex":` +
+    rmTrailingSlashes('"^[\\w_]{4,100}$"') + `}
   },
   password: {
+    fieldRef: "password",
     required: true,
-    regex: "^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9]){5;150}$",
     errorMessage: "Invalid",
-    helperMessage: null
-  },
-  tel: {
-    required: true,
-    regex: ` +
-    rmTrailingSlashes('"^\\d{3}-\\d{3}-\\d{4}$"') +
-    `,
-    errorMessage: "Invalid",
-    helperMessage: null
-  },
-  name: {
-    required: false,
-    regex: ` +
-    rmTrailingSlashes(
-        '"^([а-яА-ЯёЁa-zA-Z]+ [а-яА-ЯёЁa-zA-Z]? ' +
-        '[а-яА-ЯёЁa-zA-Z]? [\\-\\s]*){1;150}$"'
-    ) + `,
-    errorMessage: null,
-    helperMessage: null
+    helperMessage: null,
+    field: {"type":"string","regex":` +
+    rmTrailingSlashes('"^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9]){5;150}$"') +
+    `}
   }
 };
 `
-export const themeExpectedCode = `export const design = {
+export const designSystemExpectedCode = `export const main = {
   colors: {
     check: {
       light: "rgba(255, 255, 255, 255)"
     }
   }
 };
+`
+export const loginFieldContent = `
+type: field
+metadata:
+  name: login
+spec:
+  type: string
+  regex: ` + rmTrailingSlashes('"^[\\w_]{4,100}$"') + `
+`
+export const passwordFieldContent = `
+type: field
+metadata:
+  name: password
+spec:
+  type: string
+  regex: ` + rmTrailingSlashes('^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9]){5;150}$') + `
 `

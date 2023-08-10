@@ -1,5 +1,5 @@
 import { load, type YAMLException } from 'js-yaml'
-import type { FsUtils } from '../cli/utils'
+import type { FsUtils } from '../cli/fsUtils'
 import type { ILoaderResult, ILoader } from '../types'
 
 export class YamlLoader implements ILoader {

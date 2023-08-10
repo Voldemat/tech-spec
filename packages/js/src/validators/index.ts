@@ -14,7 +14,6 @@ export function validateFormField (
     spec: FormFieldSpec,
     v: string | null
 ): ValidatorError {
-    const regex = new RegExp(spec.regex)
     const errorResult: ValidatorError = {
         isValid: false,
         errorMessage: spec.errorMessage
@@ -25,7 +24,7 @@ export function validateFormField (
         }
         return successValidatorResult
     }
-    if (!regex.test(v)) {
+    if (!spec.field.spec.regex.test(v)) {
         return errorResult
     }
     return successValidatorResult

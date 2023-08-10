@@ -2,6 +2,21 @@ import Ajv, { type ValidateFunction } from 'ajv'
 import addFormats from 'ajv-formats'
 import betterAjvErrors from 'better-ajv-errors'
 import techSpecSchema from '../schema.json'
+import type {
+    DesignSystem,
+    Field,
+    Form,
+    TechSpec,
+    TechSpecContainer
+} from './types'
+
+export class SpecValidatorError extends Error {
+    messages: string[]
+    constructor (messages: string[]) {
+        super(JSON.stringify(messages))
+        this.messages = messages
+    }
+}
 
 export class SpecValidator {
     private readonly ajv: Ajv
@@ -18,7 +33,7 @@ export class SpecValidator {
         this.schema = this.ajv.compile<boolean>(techSpecSchema)
     }
 
-    validate (data: Record<string, any>): string | null {
+    validateOneSpec (data: Record<string, any>): string | null {
         const isValid = this.schema(data)
         if (!isValid) {
             if (this.schema.errors == null) {
@@ -29,5 +44,67 @@ export class SpecValidator {
             })
         }
         return null
+    }
+
+    validate (data: Array<Record<string, any>>): TechSpecContainer {
+        const errors = data
+            .map(spec => this.validateOneSpec(spec))
+            .filter((e): e is string => e !== null)
+        if (errors.length !== 0) {
+            throw new SpecValidatorError(errors)
+        }
+        const specArray = (data as TechSpec[])
+        const fields: Record<string, Field> = Object.fromEntries(
+            specArray.filter(
+                (f): f is Field => f.type === 'field'
+            ).map(field => [field.metadata.name, field]))
+        const forms: Form[] = this.mergeForms(specArray, fields)
+        const designSystems = specArray.filter(
+            (t): t is DesignSystem => t.type === 'DesignSystem'
+        )
+        return {
+            designSystems,
+            forms
+        }
+    }
+
+    mergeForms (specArray: TechSpec[], fields: Record<string, Field>): Form[] {
+        const errors: string[] = []
+        const forms = specArray.filter(
+            (form): form is Form => form.type === 'form'
+        ).map(form => {
+            const result = this.processForm(fields, form)
+            if (result instanceof Array) {
+                errors.push(...result)
+                return null
+            }
+            return result
+        }).filter((form): form is Form => form !== null)
+        if (errors.length > 0) {
+            throw new SpecValidatorError(errors)
+        }
+        return forms
+    }
+
+    processForm (fields: Record<string, Field>, form: Form): Form | string[] {
+        const errors: string[] = []
+        const newForm: Form = JSON.parse(JSON.stringify(form))
+        Object.keys(newForm.spec).forEach(fieldName => {
+            const fieldRef = newForm.spec[fieldName].fieldRef
+            if (fieldRef in fields) {
+                newForm.spec[fieldName].field = fields[fieldRef]
+            } else {
+                errors.push(
+                    `Merging Error: form:${newForm.metadata.name}` +
+                    `.spec.${fieldName}.fieldRef:` +
+                    newForm.spec[fieldName].fieldRef +
+                    ' does not exists'
+                )
+            }
+        })
+        if (errors.length > 0) {
+            return errors
+        }
+        return newForm
     }
 }

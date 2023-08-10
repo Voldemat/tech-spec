@@ -1,6 +1,13 @@
 import acorn from 'acorn'
 import * as astring from 'astring'
-import type { Form, FormFieldSpec, TechSpec, Theme } from '../../spec/types'
+import type {
+    DesignSystem,
+    DesignSystemSpec,
+    FieldSpec,
+    Form,
+    FormFieldSpec,
+    TechSpecContainer
+} from '../../spec/types'
 import { getEntries } from '../../utils'
 import type { SpecCode, TechSpecAst } from '../types'
 import type { BaseAstFactory } from './base'
@@ -34,94 +41,80 @@ export class AstFactory {
     }
 
     fromSpec (
-        specArray: TechSpec[]
+        spec: TechSpecContainer
     ): TechSpecAst {
-        const forms = specArray.filter(
-            (spec): spec is Form => spec.type === 'form'
-        )
-        const themes = specArray.filter(
-            (spec): spec is Theme => spec.type === 'theme'
-        )
         const techSpecAst: TechSpecAst = {}
-        const formsAst = this.genFormsAstFile(forms)
+        const formsAst = this.genFormsAstFile(spec.forms)
         if (formsAst !== undefined) {
             techSpecAst.form = formsAst
         }
-        const themesAst = this.genThemesAstFile(themes)
-        if (themesAst !== undefined) {
-            techSpecAst.theme = themesAst
+        const designSystemsAst = this.genDesignSystemAstFile(spec.designSystems)
+        if (designSystemsAst !== undefined) {
+            techSpecAst.DesignSystem = designSystemsAst
         }
         return techSpecAst
     }
 
-    genThemesAstFile (themes: Theme[]): Record<string, any> | undefined {
-        const themeAstBody = this.buildThemeAst(themes)
-        if (themeAstBody === null) {
+    genDesignSystemAstFile (
+        designSystems: DesignSystem[]
+    ): Record<string, any> | undefined {
+        const designSystemAstBody = this.buildDesignSystemsAst(designSystems)
+        if (designSystemAstBody === null) {
             return undefined
         }
-        return this.baseAstFactory.buildProgram([themeAstBody])
+        return this.baseAstFactory.buildProgram(designSystemAstBody)
     }
 
-    buildThemeAst (themes: Theme[]): Record<string, any> | null {
-        if (themes.length < 1) return null
-        return this.baseAstFactory.buildExportDeclaration(
-            this.baseAstFactory.buildVariable(
-                'const',
-                'design',
-                this.baseAstFactory.buildObjectExpression(
-                    [this.buildThemeProperties(themes)]
+    buildDesignSystemsAst (
+        designSystems: DesignSystem[]
+    ): Array<Record<string, any>> | null {
+        if (designSystems.length < 1) return null
+        return designSystems.map(system => {
+            return this.baseAstFactory.buildExportDeclaration(
+                this.baseAstFactory.buildVariable(
+                    'const',
+                    system.metadata.name,
+                    this.baseAstFactory.buildObjectExpression(
+                        [this.buildDesignProperties(system.spec)]
+                    )
                 )
             )
-        )
+        })
     }
 
-    private buildThemeColorsObject (
-        themes: Theme[]
-    ): Record<string, Record<string, string>> {
-        return Object.keys(themes[0].spec.colors).reduce<
-            Record<string, Record<string, string>>
-        >(
-            (obj, color) => {
-                obj[color] = this.buildThemeColorObject(color, themes)
-                return obj
-            },
-            {}
-        )
-    }
-
-    buildThemeProperties (themes: Theme[]): Record<string, any> {
-        const colorsObject = this.buildThemeColorsObject(themes)
+    buildDesignProperties (systemSpec: DesignSystemSpec): Record<string, any> {
         return this.baseAstFactory.buildProperty(
             'colors',
-            this.baseAstFactory.buildObjectExpression(
-                Object.keys(colorsObject).map(color => {
-                    return this.baseAstFactory.buildProperty(
-                        color,
-                        this.baseAstFactory.buildObjectExpression(
-                            getEntries(colorsObject[color])
-                                .map(([key, value]) => {
-                                    return this.baseAstFactory.buildProperty(
-                                        key,
-                                        {
-                                            type: 'Literal',
-                                            value
-                                        }
-                                    )
-                                })
-                        )
-                    )
-                })
-            )
+            this.buildColorsObject(systemSpec.colors)
         )
     }
 
-    buildThemeColorObject (
-        color: string, themes: Theme[]
-    ): Record<string, string> {
-        return themes.reduce<Record<string, string>>((kObj, theme) => {
-            kObj[theme.metadata.name] = theme.spec.colors[color]
-            return kObj
-        }, {})
+    buildColorsObject (
+        colors: Record<string, Record<string, string>>
+    ): Record<string, any> {
+        const obj = this.baseAstFactory.buildObjectExpression(
+            Object.entries(colors).map(([key, value]) => {
+                return this.baseAstFactory.buildProperty(
+                    key,
+                    this.buildColorObject(value)
+                )
+            })
+        )
+        return obj
+    }
+
+    buildColorObject (color: Record<string, string>): Record<string, any> {
+        return this.baseAstFactory.buildObjectExpression(
+            Object.entries(color).map(([key, value]) => {
+                return this.baseAstFactory.buildProperty(
+                    key,
+                    {
+                        type: 'Literal',
+                        value
+                    }
+                )
+            })
+        )
     }
 
     genFormsAstFile (forms: Form[]): Record<string, any> {
@@ -166,11 +159,16 @@ export class AstFactory {
             name,
             this.baseAstFactory.buildObjectExpression(
                 fieldKeys.map(fieldKey => {
+                    let value: string | boolean | FieldSpec | null
+                    const fieldValue = field[fieldKey]
+                    if (fieldValue instanceof Object) {
+                        value = fieldValue.spec
+                    } else { value = fieldValue }
                     return this.baseAstFactory.buildProperty(
                         fieldKey,
                         {
                             type: 'Literal',
-                            value: field[fieldKey]
+                            value
                         }
                     )
                 })

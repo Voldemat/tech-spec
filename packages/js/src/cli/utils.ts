@@ -1,31 +1,28 @@
-import fs from 'fs'
-import path from 'path'
 import lodash from 'lodash'
 import * as emojis from 'node-emoji'
 import chalk from 'chalk'
 import { type Command } from 'commander'
-import type { IAction, TechSpec } from '../spec/types'
+import type { IAction, TechSpecContainer } from '../spec/types'
 import {
     type ActionResult,
-    FILE_SPEC_EXTENSION,
     type ILoaderErrorResult,
     type ILoaderSuccessResult
 } from '../types'
 import { Spinner } from 'cli-spinner'
 import type { YamlLoader } from '../loaders/yaml'
-import type { SpecValidator } from '../spec/validator'
-import type { SpecCode } from '../generators/types'
+import { type SpecValidator, SpecValidatorError } from '../spec/validator'
+import { type FsUtils } from './fsUtils'
 
-interface ParsingResultSuccess {
+interface ResultSuccess<T> {
     ok: true
-    data: Array<Record<string, any>>
+    data: T
 }
-interface ParsingResultError {
+interface ResultError<T> {
     ok: false
-    data: ActionResult
+    data: T
 }
-type ParsingResult = ParsingResultSuccess | ParsingResultError
-const buildParsingError = (messages: string[]): ParsingResultError => {
+type Result<S, E> = ResultSuccess<S> | ResultError<E>
+const buildParsingError = (messages: string[]): ResultError<ActionResult> => {
     return {
         ok: false,
         data: {
@@ -35,93 +32,6 @@ const buildParsingError = (messages: string[]): ParsingResultError => {
     }
 }
 
-export class FsUtils {
-    isDirExists (pathToDir: string): boolean {
-        return fs.existsSync(pathToDir)
-    }
-
-    readFile (filePath: string): string {
-        return fs.readFileSync(filePath, 'utf-8')
-    }
-
-    writeToFile (filePath: string, content: string): void {
-        fs.writeFileSync(filePath, content)
-    }
-
-    toAbsolutePath (relativePath: string): string {
-        if (relativePath.startsWith('/')) return relativePath
-        if (process.env.PWD == null) {
-            throw new Error('PWD End is not defined')
-        }
-        return path.join(process.env.PWD, relativePath)
-    }
-
-    getTypeFromFilePath (filepath: string): TechSpec['type'] {
-        return path.parse(filepath).name as TechSpec['type']
-    }
-
-    genCodeFileName (outpurDir: string, type: TechSpec['type']): string {
-        return path.join(outpurDir, type + '.ts')
-    }
-
-    findCodeFiles (pathToDir: string): string[] {
-        return this.findFiles(pathToDir, '.ts')
-    }
-
-    findSpecFiles (pathToDir: string): string[] {
-        return this.findFiles(pathToDir, FILE_SPEC_EXTENSION)
-    }
-
-    writeGeneratedFiles (
-        outputDir: string,
-        files: Array<[TechSpec['type'], string]>
-    ): void {
-        outputDir = this.toAbsolutePath(outputDir)
-        if (!this.isDirExists(outputDir)) {
-            this.createDir(outputDir)
-        }
-        for (const [type, code] of files) {
-            this.writeToFile(
-                this.genCodeFileName(outputDir, type),
-                code
-            )
-        }
-    }
-
-    readGeneratedFiles (
-        dir: string
-    ): SpecCode {
-        dir = this.toAbsolutePath(dir)
-        return this.findCodeFiles(dir)
-            .reduce<Partial<SpecCode>>(
-                (obj, filepath) => {
-                    const code = this.readFile(filepath)
-                    const type = this.getTypeFromFilePath(filepath)
-                    obj[type] = code
-                    return obj
-                },
-                {}
-            ) as SpecCode
-    }
-
-    findFiles (pathToDir: string, endsWith: string): string[] {
-        const filePaths: string[] = []
-        fs.readdirSync(pathToDir).forEach(filePath => {
-            const fullPath = path.join(pathToDir, filePath)
-            const stat = fs.lstatSync(fullPath)
-            if (stat.isDirectory()) {
-                filePaths.push(...this.findFiles(fullPath, endsWith))
-            } else if (filePath.endsWith(endsWith)) {
-                filePaths.push(fullPath)
-            }
-        })
-        return filePaths
-    }
-
-    createDir (dir: string): void {
-        fs.mkdirSync(dir, { recursive: true })
-    }
-}
 export class SpecUtils {
     constructor (
         private readonly fsUtils: FsUtils,
@@ -136,7 +46,9 @@ export class SpecUtils {
         return lodash.isEqual(spec1, spec2)
     }
 
-    parseSpec (pathToDir: string): ParsingResult {
+    parseSpec (
+        pathToDir: string
+    ): Result<Array<Record<string, any>>, ActionResult> {
         const parsingArray = this.fsUtils.findSpecFiles(pathToDir)
             .map(filepath => this.yamlLoader.load(filepath))
         if (parsingArray.length === 0) {
@@ -156,31 +68,55 @@ export class SpecUtils {
         }
     }
 
-    getSpec (pathToDir: string): ParsingResult {
+    getSpec (
+        pathToDir: string
+    ): Result<Array<Record<string, any>>, ActionResult> {
         if (!this.fsUtils.isDirExists(pathToDir)) {
             return buildParsingError(['Provided directory does not exists'])
         }
         return this.parseSpec(pathToDir)
     }
 
-    getValidatedSpec (pathToDir: string): ParsingResult {
-        const specArray = this.getSpec(pathToDir)
+    validateSpec (
+        specArray: Result<Array<Record<string, any>>, ActionResult>
+    ): Result<TechSpecContainer, ActionResult> {
         if (!specArray.ok) {
             return specArray
         }
-        const errors = specArray.data
-            .map(spec => this.specValidator.validate(spec))
-            .filter((e): e is string => e !== null)
-        if (errors.length !== 0) {
+        try {
             return {
-                ok: false,
-                data: {
-                    isError: true,
-                    messages: errors
+                ok: true,
+                data: this.specValidator.validate(specArray.data)
+            }
+        } catch (error) {
+            if (error instanceof SpecValidatorError) {
+                return {
+                    ok: false,
+                    data: {
+                        isError: true,
+                        messages: error.messages
+                    }
                 }
             }
+            throw error
         }
-        return specArray
+    }
+
+    getFields (
+        data: Array<Record<string, any>>
+    ): Record<string, Record<string, any>> {
+        return Object.fromEntries(
+            data.filter(d => d.type === 'field').map(d => {
+                return [d.metadata.name, d]
+            })
+        )
+    }
+
+    getValidatedSpec (
+        pathToDir: string
+    ): Result<TechSpecContainer, ActionResult> {
+        const specArray = this.getSpec(pathToDir)
+        return this.validateSpec(specArray)
     }
 }
 

@@ -5,21 +5,23 @@ import os from 'os'
 import path from 'path'
 import { runCLI } from './conftest'
 import {
+    designSystemContent,
+    designSystemExpectedCode,
     formExpectedCode,
     formYamlContent,
-    themeExpectedCode,
-    themeYamlContent
+    loginFieldContent,
+    passwordFieldContent
 } from './snippets'
 
 describe('CLI:generate', () => {
     const techSpecFolder = path.join(os.tmpdir(), 'tech-spec-' + uuid4())
     const outputFolder = path.join(os.tmpdir(), 'tech-spec-output-' + uuid4())
-    const formPath = path.join(outputFolder, 'form.ts')
-    const themePath = path.join(outputFolder, 'theme.ts')
+    const formPath = path.join(outputFolder, 'forms.ts')
+    const designSystemPath = path.join(outputFolder, 'designs.ts')
 
-    function saveThemeFile (content: string): void {
+    function saveDesignSystemFile (content: string): void {
         fs.writeFileSync(
-            path.join(techSpecFolder, 'light-theme.tech-spec.yaml'),
+            path.join(techSpecFolder, 'main-design.tech-spec.yaml'),
             content
         )
     }
@@ -27,6 +29,18 @@ describe('CLI:generate', () => {
     function saveFormFile (content: string): void {
         fs.writeFileSync(
             path.join(techSpecFolder, 'registration-form.tech-spec.yaml'),
+            content
+        )
+    }
+    function saveLoginFieldFile (content: string): void {
+        fs.writeFileSync(
+            path.join(techSpecFolder, 'login.tech-spec.yaml'),
+            content
+        )
+    }
+    function savePasswordFieldFile (content: string): void {
+        fs.writeFileSync(
+            path.join(techSpecFolder, 'password.tech-spec.yaml'),
             content
         )
     }
@@ -45,8 +59,10 @@ describe('CLI:generate', () => {
     it(
         'should return green "❇️ Code is successfully generated" message',
         async () => {
-            saveThemeFile(themeYamlContent)
+            saveDesignSystemFile(designSystemContent)
             saveFormFile(formYamlContent)
+            saveLoginFieldFile(loginFieldContent)
+            savePasswordFieldFile(passwordFieldContent)
             const output = await runCLI(
                 `generate ${techSpecFolder} ${outputFolder}`
             )
@@ -57,11 +73,11 @@ describe('CLI:generate', () => {
                 'Code is successfully generated\u001b[39m'
             )
             expect(fs.existsSync(formPath)).toBe(true)
-            expect(fs.existsSync(themePath)).toBe(true)
+            expect(fs.existsSync(designSystemPath)).toBe(true)
             const formCode = fs.readFileSync(formPath, 'utf-8')
             expect(formCode).toBe(formExpectedCode)
-            const themeCode = fs.readFileSync(themePath, 'utf-8')
-            expect(themeCode).toBe(themeExpectedCode)
+            const designSystemCode = fs.readFileSync(designSystemPath, 'utf-8')
+            expect(designSystemCode).toBe(designSystemExpectedCode)
         }
     )
 })

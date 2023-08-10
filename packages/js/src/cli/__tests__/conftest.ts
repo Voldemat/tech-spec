@@ -7,7 +7,11 @@ export async function runCLI (
 ): Promise<execa.ExecaReturnValue<string>> {
     return await new Promise<execa.ExecaReturnValue<string>>((resolve) => {
         const subprocess = execa.command(`npm run --silent cli ${argv}`, {
-            reject: false
+            reject: false,
+            extendEnv: true,
+            env: {
+                FORCE_COLOR: 'true'
+            }
         })
         if (subprocess.stderr === null || subprocess.stdout === null) {
             throw new Error('Subprocess doesn`t have stderr or stdout')

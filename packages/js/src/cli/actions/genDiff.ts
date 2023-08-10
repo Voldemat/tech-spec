@@ -1,13 +1,16 @@
 import type { ActionResult } from '../../types'
 import type { AstFactory } from '../../generators/js'
-import type { IAction, TechSpec } from '../../spec/types'
-import type { FsUtils, SpecUtils } from '../utils'
+import type { IAction } from '../../spec/types'
+import type { SpecUtils } from '../utils'
+import type { CodeToSpecGenerator } from '../../generators/js/specGenerator'
+import type { FsUtils } from '../fsUtils'
 
 export class GenDiffAction implements IAction {
     constructor (
         private readonly fsUtils: FsUtils,
         private readonly specUtils: SpecUtils,
-        private readonly astFactory: AstFactory
+        private readonly astFactory: AstFactory,
+        private readonly specGenerator: CodeToSpecGenerator
     ) {}
 
     run (
@@ -18,12 +21,12 @@ export class GenDiffAction implements IAction {
         if (!specResult.ok) {
             return specResult.data
         }
-        const generatedAst = this.astFactory.fromSpec(
-            specResult.data as TechSpec[]
+        const spec = specResult.data
+        const sourceCodeAst = this.astFactory.fromCode(
+            this.fsUtils.readGeneratedFiles(outputDir)
         )
-        const specCode = this.fsUtils.readGeneratedFiles(outputDir)
-        const sourceCodeAst = this.astFactory.fromCode(specCode)
-        if (this.specUtils.isEqual(generatedAst, sourceCodeAst)) {
+        const codeSpec = this.specGenerator.fromAst(sourceCodeAst)
+        if (this.specUtils.isEqual(spec, codeSpec)) {
             return {
                 isError: false,
                 messages: ['Generated code is consistent with spec']
