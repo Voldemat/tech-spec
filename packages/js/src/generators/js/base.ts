@@ -63,4 +63,25 @@ export class BaseAstFactory {
             value
         }
     }
+
+    buildNewExpression (
+        calleeName: string,
+        args: any[]
+    ): Record<string, any> {
+        return {
+            type: 'NewExpression',
+            callee: {
+                type: 'Identifier',
+                name: calleeName
+            },
+            arguments: args.map(v => ({ type: 'Literal', value: v }))
+        }
+    }
+
+    buildLiteral (v: any): Record<string, any> {
+        return {
+            type: 'Literal',
+            value: v
+        }
+    }
 }

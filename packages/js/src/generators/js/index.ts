@@ -1,14 +1,14 @@
 import acorn from 'acorn'
-import * as astring from 'astring'
 import type {
     DesignSystem,
     DesignSystemSpec,
+    Feature,
+    FeatureFieldSpec,
     FieldSpec,
     Form,
     FormFieldSpec,
     TechSpecContainer
 } from '../../spec/types'
-import { getEntries } from '../../utils'
 import type { SpecCode, TechSpecAst } from '../types'
 import type { BaseAstFactory } from './base'
 import { nestedOmit } from './utils'
@@ -51,6 +51,10 @@ export class AstFactory {
         const designSystemsAst = this.genDesignSystemAstFile(spec.designSystems)
         if (designSystemsAst !== undefined) {
             techSpecAst.DesignSystem = designSystemsAst
+        }
+        const featuresAst = this.genFeaturesAstFile(spec.features)
+        if (featuresAst !== undefined) {
+            techSpecAst.feature = featuresAst
         }
         return techSpecAst
     }
@@ -117,7 +121,70 @@ export class AstFactory {
         )
     }
 
-    genFormsAstFile (forms: Form[]): Record<string, any> {
+    genFeaturesAstFile (features: Feature[]): Record<string, any> {
+        return this.baseAstFactory.buildProgram(
+            features.map(feature => this.genFeatureAst(feature))
+        )
+    }
+
+    genFeatureAst (feature: Feature): Record<string, any> {
+        const fields: Array<[string, FeatureFieldSpec]> = Object.entries(
+            feature.spec
+        )
+        return this.baseAstFactory.buildExportDeclaration(
+            this.baseAstFactory.buildVariable(
+                'const',
+                feature.metadata.name + 'Feature',
+                this.baseAstFactory.buildObjectExpression(
+                    fields.map(
+                        ([name, field]) => (
+                            this.buildFeatureFieldAst(name, field)
+                        )
+                    )
+                )
+            )
+        )
+    }
+
+    buildFeatureFieldAst (
+        fieldName: string, field: FeatureFieldSpec
+    ): Record<string, any> {
+        let value: Record<string, any>
+        if (field.type === 'date' || field.type === 'date-time') {
+            value = this.baseAstFactory.buildNewExpression(
+                'Date', [field.value]
+            )
+        } else if (field.type === 'link') {
+            value = this.baseAstFactory.buildNewExpression(
+                'URL', [field.value]
+            )
+        } else {
+            value = this.baseAstFactory.buildLiteral(field.value)
+        }
+        return this.createFeatureFieldAst(fieldName, field.type, value)
+    }
+
+    private createFeatureFieldAst (
+        fieldName: string,
+        type: string,
+        value: Record<string, any>
+    ): Record<string, any> {
+        return this.baseAstFactory.buildProperty(
+            fieldName,
+            this.baseAstFactory.buildObjectExpression([
+                this.baseAstFactory.buildProperty(
+                    'type', this.baseAstFactory.buildLiteral(type)
+                ),
+                this.baseAstFactory.buildProperty(
+                    'value',
+                    value
+                )
+            ])
+        )
+    }
+
+    genFormsAstFile (forms: Form[]): Record<string, any> | undefined {
+        if (forms.length === 0) return undefined
         return this.baseAstFactory.buildProgram(
             forms.map(form => this.genFormAst(form))
         )
@@ -174,26 +241,5 @@ export class AstFactory {
                 })
             )
         )
-    }
-}
-export class CodeFactory {
-    generate (ast: TechSpecAst): SpecCode {
-        return getEntries(ast)
-            .filter(
-                (entry): entry is [
-                    keyof TechSpecAst, Record<string, any>
-                ] => {
-                    return entry?.[1] !== undefined
-                }
-            )
-            .reduce<SpecCode>(
-                (obj, [type, ast]) => {
-                    if (ast !== undefined) {
-                        obj[type] = astring.generate(ast as astring.Node)
-                    }
-                    return obj
-                },
-                {}
-            )
     }
 }

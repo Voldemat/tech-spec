@@ -1,9 +1,10 @@
 import type { ActionResult } from '../../types'
-import type { CodeFactory, AstFactory } from '../../generators/js'
+import type { AstFactory } from '../../generators/js'
 import type { IAction, TechSpec } from '../../spec/types'
 import type { SpecUtils } from '../utils'
 import { getEntries } from '../../utils'
 import type { FsUtils } from '../fsUtils'
+import type { CodeFactory } from '../../generators/js/codeFactory'
 
 export class GenerateAction implements IAction {
     constructor (

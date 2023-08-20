@@ -1,7 +1,8 @@
 #! /usr/bin/env node
 
-import { AstFactory, CodeFactory } from '../generators/js'
+import { AstFactory } from '../generators/js'
 import { BaseAstFactory } from '../generators/js/base'
+import { CodeFactory } from '../generators/js/codeFactory'
 import { CodeToSpecGenerator } from '../generators/js/specGenerator'
 import { YamlLoader } from '../loaders/yaml'
 import { SpecValidator } from '../spec/validator'

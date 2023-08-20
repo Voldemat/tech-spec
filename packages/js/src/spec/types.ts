@@ -1,5 +1,26 @@
 import type { ActionResult } from '../types'
 
+export interface FeatureMetadata {
+    name: string
+}
+export type FeatureStringFieldType = (
+    'uuid' | 'string' | 'link' | 'date' | 'time' | 'date-time' | 'duration'
+)
+export type FeatureNumberFieldType = 'int' | 'uint' | 'float'
+export interface FeatureStringFieldSpec {
+    type: FeatureStringFieldType
+    value: string
+}
+export interface FeatureNumberFieldSpec {
+    type: FeatureNumberFieldType
+    value: number
+}
+export type FeatureFieldSpec = FeatureStringFieldSpec | FeatureNumberFieldSpec
+export interface Feature {
+    type: 'feature'
+    metadata: FeatureMetadata
+    spec: Record<string, FeatureFieldSpec>
+}
 export interface FieldMetadata {
     name: string
 }
@@ -38,11 +59,12 @@ export interface DesignSystem {
     metadata: DesignSystemMetadata
     spec: DesignSystemSpec
 }
-export type TechSpec = Form | DesignSystem | Field
+export type TechSpec = Form | DesignSystem | Field | Feature
 
 export interface TechSpecContainer {
     designSystems: DesignSystem[]
     forms: Form[]
+    features: Feature[]
 }
 export interface IAction {
     run: (...args: any) => ActionResult

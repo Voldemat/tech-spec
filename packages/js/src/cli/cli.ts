@@ -4,7 +4,7 @@ import { Command } from 'commander'
 import { generateCommand } from './commands/generate'
 import { buildActionCallback, type SpecUtils } from './utils'
 import type { YamlLoader } from '../loaders/yaml'
-import type { AstFactory, CodeFactory } from '../generators/js'
+import type { AstFactory } from '../generators/js'
 import { GenerateAction } from './actions/generate'
 import { validateCommand } from './commands/validate'
 import { ValidateAction } from './actions/validate'
@@ -14,6 +14,7 @@ import type { SpecValidator } from '../spec/validator'
 import type { IAction } from '../spec/types'
 import type { CodeToSpecGenerator } from '../generators/js/specGenerator'
 import type { FsUtils } from './fsUtils'
+import type { CodeFactory } from '../generators/js/codeFactory'
 
 const packageJson = JSON.parse(
     fs.readFileSync(

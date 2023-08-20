@@ -4,6 +4,7 @@ import betterAjvErrors from 'better-ajv-errors'
 import techSpecSchema from '../schema.json'
 import type {
     DesignSystem,
+    Feature,
     Field,
     Form,
     TechSpec,
@@ -62,9 +63,13 @@ export class SpecValidator {
         const designSystems = specArray.filter(
             (t): t is DesignSystem => t.type === 'DesignSystem'
         )
+        const features = specArray.filter(
+            (f): f is Feature => f.type === 'feature'
+        )
         return {
             designSystems,
-            forms
+            forms,
+            features
         }
     }
 

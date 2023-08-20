@@ -126,13 +126,13 @@ const msgDelimeter = chalk.whiteBright('\n' + '_'.repeat(40) + '\n\n')
 export function createErrorMessage (messages: string[]): string {
     return messages
         .map(
-            msg => emojis.emojify(chalk.redBright`🚨 ${msg}`)
+            msg => emojis.emojify('🚨 ' + chalk.redBright`${msg}`)
         )
         .join(msgDelimeter)
 }
 export function createSuccessMessage (messages: string[]): string {
     return messages
-        .map(msg => emojis.emojify(chalk.greenBright`❇️  msg`))
+        .map(msg => emojis.emojify('❇️  ' + chalk.greenBright`${msg}`))
         .join(msgDelimeter)
 }
 export function buildActionCallback (

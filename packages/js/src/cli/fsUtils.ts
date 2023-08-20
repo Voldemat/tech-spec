@@ -32,6 +32,8 @@ export class FsUtils {
             return 'form'
         case 'designs':
             return 'DesignSystem'
+        case 'features':
+            return 'feature'
         default:
             return null
         }
@@ -45,6 +47,9 @@ export class FsUtils {
             break
         case 'DesignSystem':
             filename = 'designs'
+            break
+        case 'feature':
+            filename = 'features'
             break
         default:
             throw new Error(`Unhandled spec type ${type}`)
