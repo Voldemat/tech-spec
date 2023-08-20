@@ -114,6 +114,10 @@ export class CodeToSpecGenerator {
                     ]
                 } else if (property.value.type === 'ObjectExpression') {
                     return [property.key.name, this.genObject(property)]
+                } else if (property.value.type === 'NewExpression') {
+                    return [
+                        property.key.name, property.value.arguments[0].value
+                    ]
                 } else {
                     throw new Error(
                         'Unhandled property value type: ' +

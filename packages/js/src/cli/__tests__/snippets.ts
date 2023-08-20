@@ -30,17 +30,23 @@ export const formExpectedCode = `export const RegistrationForm = {
     fieldRef: "login",
     errorMessage: null,
     helperMessage: null,
-    field: {"type":"string","regex":` +
-    rmTrailingSlashes('"^[\\w_]{4,100}$"') + `}
+    field: {
+      type: "string",
+      regex: new RegExp(` +
+    rmTrailingSlashes('"^[\\w_]{4,100}$"') + `)
+    }
   },
   password: {
     fieldRef: "password",
     required: true,
     errorMessage: "Invalid",
     helperMessage: null,
-    field: {"type":"string","regex":` +
+    field: {
+      type: "string",
+      regex: new RegExp(` +
     rmTrailingSlashes('"^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9]){5;150}$"') +
-    `}
+    `)
+    }
   }
 };
 `

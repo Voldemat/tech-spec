@@ -4,7 +4,7 @@ import type {
     DesignSystemSpec,
     Feature,
     FeatureFieldSpec,
-    FieldSpec,
+    Field,
     Form,
     FormFieldSpec,
     TechSpecContainer
@@ -226,20 +226,25 @@ export class AstFactory {
             name,
             this.baseAstFactory.buildObjectExpression(
                 fieldKeys.map(fieldKey => {
-                    let value: string | boolean | FieldSpec | null
-                    const fieldValue = field[fieldKey]
-                    if (fieldValue instanceof Object) {
-                        value = fieldValue.spec
-                    } else { value = fieldValue }
                     return this.baseAstFactory.buildProperty(
                         fieldKey,
-                        {
-                            type: 'Literal',
-                            value
-                        }
+                        this.buildFormFieldValue(field[fieldKey])
                     )
                 })
             )
         )
+    }
+
+    buildFormFieldValue (value: string | boolean | Field | null): any {
+        if (!(value instanceof Object)) return { type: 'Literal', value }
+        return this.baseAstFactory.buildObjectExpression([
+            this.baseAstFactory.buildProperty(
+                'type', this.baseAstFactory.buildLiteral(value.spec.type)
+            ),
+            this.baseAstFactory.buildProperty(
+                'regex', this.baseAstFactory.buildNewExpression(
+                    'RegExp', [value.spec.regex]
+                ))
+        ])
     }
 }
