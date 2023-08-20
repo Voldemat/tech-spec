@@ -1,6 +1,12 @@
-import { type FormFieldSpec } from '../spec/types'
+import { type FieldSpec } from '../spec/types'
 
-export type FormValidationSpec = Record<string, FormFieldSpec>
+export interface ValidationFormFieldSpec {
+    field: FieldSpec
+    fieldRef: string
+    required: boolean
+    errorMessage: string | null
+}
+export type FormValidationSpec = Record<string, ValidationFormFieldSpec>
 export interface ValidatorError {
   isValid: boolean
   errorMessage: string | null
@@ -11,7 +17,7 @@ export const successValidatorResult: ValidatorError = {
     errorMessage: null
 }
 export function validateFormField (
-    spec: FormFieldSpec,
+    spec: ValidationFormFieldSpec,
     v: string | null
 ): ValidatorError {
     const errorResult: ValidatorError = {
@@ -24,12 +30,12 @@ export function validateFormField (
         }
         return successValidatorResult
     }
-    if (!spec.field.spec.regex.test(v)) {
+    if (!spec.field.regex.test(v)) {
         return errorResult
     }
     return successValidatorResult
 }
-export function buildValidator (spec: FormFieldSpec): ValidatorFunc {
+export function buildValidator (spec: ValidationFormFieldSpec): ValidatorFunc {
     return (v: string | null) => {
         return validateFormField(spec, v)
     }
@@ -40,7 +46,9 @@ export type FormValidators<T extends FormValidationSpec> = {
 export function buildValidators<T extends FormValidationSpec> (
     form: T
 ): FormValidators<T> {
-    const entries = Object.entries(form) as Array<[keyof T, FormFieldSpec]>
+    const entries = Object.entries(
+        form
+    ) as Array<[keyof T, ValidationFormFieldSpec]>
     return entries.reduce<Partial<FormValidators<T>>>(
         (obj, entry) => {
             const [key, field] = entry
