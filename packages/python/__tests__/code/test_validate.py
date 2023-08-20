@@ -13,18 +13,26 @@ def test_validate(tmpdir: Path, tmpdir2: Path) -> None:
         spec:
             login:
                 required: true
-                regex: '$.{5,150}^'
+                fieldRef: login
                 errorMessage: null
                 helperMessage: null
         """
     )
-    codefile = tmpdir2 / "forms.py"
+    fieldfile = tmpdir / "login.tech-spec.yaml"
+    fieldfile.write_text(
+        """
+        type: field
+        metadata:
+            name: login
+        spec:
+            type: string
+            regex: '$.{5,150}^'
+        """
+    )
+    codefile = tmpdir2 / "fields.py"
     codefile.write_text(
-        (
-            "forms = {'some-form': {'login': {'required': True,"
-            " 'regex': '$.{5,150}^',\n"
-            "    'helperMessage': None, 'errorMessage': None}}}\n"
-        )
+        "import re\nlogin = {'type': 'string', "
+        "'regex': re.compile('$.{5,150}^')}\n"
     )
     process = run_cli(["code", "validate", str(tmpdir), str(tmpdir2)])
     assert process.returncode == 0, process.stderr

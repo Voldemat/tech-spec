@@ -23,8 +23,8 @@ def generate_action(
     code = generator.generate(spec)
     if not output_dir.exists():
         output_dir.mkdir(parents=True)
-    with open(output_dir / "forms.py", "w+") as file:
-        file.write(code.forms)
+    with open(output_dir / "fields.py", "w+") as file:
+        file.write(code.fields)
     with open(output_dir / "__init__.py", "w+") as file:
         pass
     print("Code generated successfully")
@@ -43,7 +43,8 @@ def validate_action(
     except GeneratorService.exc.OutputDirectoryDoesNotExists:
         stderr.print("Provided code directory does not exists")
         raise typer.Exit(1)
-    spec.themes = []
+    spec.design_systems = []
+    spec.forms = []
     if spec != code_spec:
         stderr.print("Code is not sync with schema")
         raise typer.Exit(1)

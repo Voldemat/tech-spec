@@ -7,9 +7,9 @@ import astor
 from . import exceptions
 from .dtos import SpecCodeDTO
 from ..schema.dtos import (
-    FORM_DTO,
-    FormFieldDTO,
-    FormMetadataDTO,
+    FIELD_DTO,
+    FieldMetadataDTO,
+    FieldSpecDTO,
     SpecDTO,
     TechSpecDTO,
 )
@@ -40,76 +40,62 @@ class GeneratorService:
     exc = exceptions
 
     def generate(self, spec: TechSpecDTO) -> SpecCodeDTO:
-        value = ast.Dict(keys=[], values=[])
-        for form in spec.forms:
-            value.keys.append(ast.Constant(value=form.metadata.name))
-            value.values.append(
-                ast.Dict(
-                    keys=list(map(to_constant, form.spec.keys())),
-                    values=list(
-                        map(
-                            lambda v: ast.Dict(
-                                keys=[
-                                    to_constant("required"),
-                                    to_constant("regex"),
-                                    to_constant("helperMessage"),
-                                    to_constant("errorMessage"),
-                                ],
-                                values=[
-                                    to_constant(v.required),
-                                    to_constant(v.regex),
-                                    to_constant(v.helper_message),
-                                    to_constant(v.error_message),
-                                ],
+        body: list[ast.AST] = [ast.Import(names=[ast.alias(name="re")])]
+        for field in spec.fields:
+            body.append(
+                ast.Assign(
+                    targets=[ast.Name(id=field.metadata.name)],
+                    value=ast.Dict(
+                        keys=[ast.Constant("type"), ast.Constant("regex")],
+                        values=[
+                            ast.Constant(field.spec.type),
+                            ast.Call(
+                                func=ast.Attribute(
+                                    value=ast.Name(id="re"), attr="compile"
+                                ),
+                                args=[ast.Constant(field.spec.regex)],
+                                keywords=[],
                             ),
-                            form.spec.values(),
-                        )
+                        ],
                     ),
                 )
             )
 
-        module = ast.Module(
-            body=[
-                ast.Assign(
-                    targets=[ast.Name(id="forms")],
-                    value=value,
-                )
-            ]
-        )
+        module = ast.Module(body=body)
         data = astor.to_source(module)
-        return SpecCodeDTO(forms=data)
+        return SpecCodeDTO(fields=data)
 
     def get_techspec(self, dir_path: Path) -> TechSpecDTO:
-        forms_file = dir_path / "forms.py"
-        forms: list[FORM_DTO] = []
-        if forms_file.exists():
-            with open(forms_file, "r") as file:
+        fields_file = dir_path / "fields.py"
+        fields: list[FIELD_DTO] = []
+        if fields_file.exists():
+            with open(fields_file, "r") as file:
                 content = file.read()
 
             module = ast.parse(content)
-            forms_dict = self.get_forms_dict(module)
-            if forms_dict is not None:
-                for form_name, form_fields in forms_dict.items():
-                    spec = {}
-                    fields = from_dict(form_fields, from_constant)
-                    for field, field_spec in fields.items():
-                        properties_dict = from_dict(
-                            field_spec, from_constant, from_constant
-                        )
-                        spec[field] = FormFieldDTO(
-                            required=properties_dict["required"],
-                            regex=properties_dict["regex"],
-                            helper_message=properties_dict["helperMessage"],
-                            error_message=properties_dict["errorMessage"],
-                        )
-                    forms.append(
-                        SpecDTO(
-                            type="form",
-                            metadata=FormMetadataDTO(name=form_name),
-                            spec=spec,
-                        )
+            for variable in filter(
+                lambda v: isinstance(v, ast.Assign), module.body
+            ):
+                value = from_dict(
+                    variable.value,  # type: ignore
+                    from_constant,
+                    lambda v: v.args[0].value  # type: ignore
+                    if isinstance(v, ast.Call)
+                    else v.value,
+                )
+                fields.append(
+                    SpecDTO(
+                        type="field",
+                        metadata=FieldMetadataDTO(
+                            name=variable.targets[0].id  # type: ignore
+                        ),
+                        spec=FieldSpecDTO(
+                            type=value["type"],
+                            regex=value["regex"],
+                        ),
                     )
-        return TechSpecDTO(forms=forms, themes=[])
+                )
+        return TechSpecDTO(fields=fields, forms=[], design_systems=[])
 
     def get_forms_dict(self, module: ast.Module) -> dict[str, Any] | None:
         forms_var: ast.Dict | None = next(

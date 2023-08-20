@@ -13,23 +13,67 @@ def test_get_spec(tmpdir: Path) -> None:
         spec:
             login:
                 required: true
-                regex: '$.{5,150}^'
+                fieldRef: login
                 errorMessage: null
                 helperMessage: null
         """
     )
+    loginfile = tmpdir / "login.tech-spec.yaml"
+    loginfile.write_text(
+        """
+        type: field
+        metadata:
+            name: 'login'
+        spec:
+            type: 'string'
+            regex: '$.{5,150}^'
+
+        """
+    )
     process = run_cli(["schema", "get-spec", str(tmpdir)])
     assert process.returncode == 0, process.stderr
+    print(process.stdout)
     assert process.stdout == (
-        '{\n    "forms": [\n        {\n            '
-        '"type": "form",\n            "metadata":'
-        ' {\n                "name": "some-form"\n'
-        '            },\n            "spec": '
-        '{\n                "login": {\n                    '
-        '"required": true,\n                    '
-        '"regex": "$.{5,150}^",\n                    '
-        '"error_message": null,\n                    '
-        '"helper_message": null\n                }\n'
-        "            }\n        }\n    ],\n    "
-        '"themes": []\n}\n'
+        """{
+    "forms": [
+        {
+            "type": "form",
+            "metadata": {
+                "name": "some-form"
+            },
+            "spec": {
+                "login": {
+                    "required": true,
+                    "fieldRef": "login",
+                    "field": {
+                        "type": "field",
+                        "metadata": {
+                            "name": "login"
+                        },
+                        "spec": {
+                            "type": "string",
+                            "regex": "$.{5,150}^"
+                        }
+                    },
+                    "error_message": null,
+                    "helper_message": null
+                }
+            }
+        }
+    ],
+    "fields": [
+        {
+            "type": "field",
+            "metadata": {
+                "name": "login"
+            },
+            "spec": {
+                "type": "string",
+                "regex": "$.{5,150}^"
+            }
+        }
+    ],
+    "design_systems": []
+}
+"""
     )

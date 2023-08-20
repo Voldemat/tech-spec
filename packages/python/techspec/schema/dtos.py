@@ -15,6 +15,20 @@ class SpecDTO(Generic[T, M, S]):
 
 
 @dataclass
+class FieldMetadataDTO:
+    name: str
+
+
+@dataclass
+class FieldSpecDTO:
+    type: Literal["string"]
+    regex: re.Pattern[str]
+
+
+FIELD_DTO = SpecDTO[Literal["field"], FieldMetadataDTO, FieldSpecDTO]
+
+
+@dataclass
 class FormMetadataDTO:
     name: str
 
@@ -22,26 +36,32 @@ class FormMetadataDTO:
 @dataclass
 class FormFieldDTO:
     required: bool
-    regex: re.Pattern[str]
+    fieldRef: str
+    field: FIELD_DTO
     error_message: str | None
     helper_message: str | None
 
 
+FORM_DTO = SpecDTO[Literal["form"], FormMetadataDTO, dict[str, FormFieldDTO]]
+
+
 @dataclass
-class ThemeMetadataDTO:
+class DesignSystemMetadataDTO:
     name: str
 
 
 @dataclass
-class ThemeSpecDTO:
+class DesignSystemSpecDTO:
     colors: dict[str, str]
 
 
-FORM_DTO = SpecDTO[Literal["form"], FormMetadataDTO, dict[str, FormFieldDTO]]
-THEME_DTO = SpecDTO[Literal["theme"], ThemeMetadataDTO, ThemeSpecDTO]
+DESIGN_SYSTEM_DTO = SpecDTO[
+    Literal["DesignSystem"], DesignSystemMetadataDTO, DesignSystemSpecDTO
+]
 
 
 @dataclass
 class TechSpecDTO:
     forms: list[FORM_DTO]
-    themes: list[THEME_DTO]
+    fields: list[FIELD_DTO]
+    design_systems: list[DESIGN_SYSTEM_DTO]

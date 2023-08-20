@@ -13,22 +13,33 @@ def test_generate(tmpdir: Path, tmpdir2: Path) -> None:
         spec:
             login:
                 required: true
-                regex: '$.{5,150}^'
+                fieldRef: login
                 errorMessage: null
                 helperMessage: null
+        """
+    )
+    loginfile = tmpdir / "login.tech-spec.yaml"
+    loginfile.write_text(
+        """
+        type: field
+        metadata:
+            name: login
+        spec:
+            type: string
+            regex: '$.{5,150}^'
         """
     )
     process = run_cli(["code", "generate", str(tmpdir), str(tmpdir2)])
     assert process.returncode == 0, process.stderr
     assert process.stdout == "Code generated successfully\n"
     assert (tmpdir2 / "__init__.py").exists()
-    generated_filepath = tmpdir2 / "forms.py"
+    generated_filepath = tmpdir2 / "fields.py"
     assert generated_filepath.exists()
     with open(generated_filepath, "r") as file:
         content = file.read()
 
+    print(content)
     assert content == (
-        "forms = {'some-form': {'login': {'required': True,"
-        " 'regex': '$.{5,150}^',\n"
-        "    'helperMessage': None, 'errorMessage': None}}}\n"
+        "import re\nlogin = {'type': 'string', "
+        "'regex': re.compile('$.{5,150}^')}\n"
     )

@@ -13,9 +13,20 @@ def test_validate_valid_spec(tmpdir: Path) -> None:
         spec:
             login:
                 required: true
-                regex: '$.{5,150}^'
+                fieldRef: login
                 errorMessage: null
                 helperMessage: null
+        """
+    )
+    fieldpath = tmpdir / "login.tech-spec.yaml"
+    fieldpath.write_text(
+        """
+        type: field
+        metadata:
+            name: login
+        spec:
+            type: string
+            regex: '$.{5,150}^'
         """
     )
     process = run_cli(["schema", "validate", str(tmpdir)])
