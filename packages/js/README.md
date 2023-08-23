@@ -13,14 +13,23 @@ npm install -g tech-spec
 
 ## Usage example
 
-tech-spec/light.theme.tech-spec.yaml
+tech-spec/login.field.tech-spec.yaml
 ```yaml
-type: theme
+type: field
 metadata:
-  name: light
+  name: login
 spec:
-  colors:
-    check: rgba(255, 255, 255, 255)
+    type: string
+    regex: '^[\w_]{4,100}$'
+```
+tech-spec/password.field.tech-spec.yaml
+```yaml
+type: field
+metadata:
+  name: password
+spec:
+  type: string
+  regex: '^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9]){5;150}$'
 ```
 tech-spec/registration.form.tech-spec.yaml
 ```yaml
@@ -30,24 +39,15 @@ metadata:
 spec:
   login:
     required: true
-    regex: '^[\w_]{4,100}$'
+    fieldRef: login
+    helperMessage: null
     errorMessage: null
 
   password:
     required: true
-    regex: '^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9]){5;150}$'
+    fieldRef: password
     errorMessage: 'Invalid'
-
-  tel:
-    required: true
-    regex: '^\d{3}-\d{3}-\d{4}$'
-    errorMessage: 'Invalid'
-
-  name:
-      required: false
-      regex: '^([а-яА-ЯёЁa-zA-Z]+ [а-яА-ЯёЁa-zA-Z]? [а-яА-ЯёЁa-zA-Z]? [\-\s]*){1;150}$'
-      errorMessage: null
-
+    helperMessage: null
 ```
 
 Command:
@@ -56,40 +56,31 @@ techspec generate tech-spec output
 ❇️  Code is successfully generated
 ```
 
-output/theme.ts
-```typescript
-export const design = {
-  colors: {
-    check: {
-      light: "rgba(255, 255, 255, 255)"
-    }
-  }
-};
-```
 output/form.ts
 ```typescript
 export const RegistrationForm = {
   login: {
     required: true,
-    regex: "^[\\w_]{4,100}$",
-    errorMessage: null
+    fieldRef: "login",
+    helperMessage: null,
+    errorMessage: null,
+    field: {
+      type: "string",
+      regex: new RegExp("^[\\w_]4,100}$")
+    }
   },
   password: {
     required: true,
-    regex: "^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9]){5;150}$",
-    errorMessage: "Invalid"
-  },
-  tel: {
-    required: true,
-    regex: "^\\d{3}-\\d{3}-\\d{4}$",
-    errorMessage: "Invalid"
-  },
-  name: {
-    required: false,
-    regex: "^([а-яА-ЯёЁa-zA-Z]+ [а-яА-ЯёЁa-zA-Z]? [а-яА-ЯёЁa-zA-Z]? [\\-\\s]*){1;150}$",
-    errorMessage: null
+    fieldRef: "password",
+    errorMessage: "Invalid",
+    helperMessage: null,
+    field: {
+      type: "string",
+      regex: new RegExp("^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9]){5;150}$")
+    }
   }
 };
+
 ```
 
 In your client code:
@@ -120,15 +111,122 @@ spec:
 ```bash
 techspec validate tech-spec
 ```
+    🚨 YamlParsingError: tech-spec/registration.form.tech-spec.yaml
 
-    🚨 YamlParsingError: tech-spec/light-theme.tech-spec.yaml
+    Reason: bad indentation of a mapping entry
 
-    Reason: can not read an implicit mapping pair; a colon is missed
+    4 | spec:
+    5 |   login:
+    6 |     asdasd
+    7 |     required: true
+    -----------------^
+    8 |     fieldRef: login
+    9 |     helperMessage: null
 
-    1 | type: theme
-    2 | metadata:
-    3 |   name: light
-    4 |   asd
-    ----------^
-    5 | spec:
-    6 |   colors:
+
+### Types of spec
+- form
+- field
+- DesignSystem
+- feature
+
+#### Form
+type: form
+Metadata fields:
+- name: string
+
+Each key in spec mapping represents name of field.
+Field mapping keys:
+- required: boolean
+- errorMessage: string | null
+- helperMessage: string | null
+- fieldRef: string (must be the same as field.metadata.name)
+
+Example:
+```yaml
+type: form
+metadata:
+  name: Registration
+spec:
+  login:
+    required: true
+    fieldRef: login
+    helperMessage: null
+    errorMessage: null
+
+  password:
+    required: true
+    fieldRef: password
+    errorMessage: 'Invalid'
+    helperMessage: null
+```
+#### Field
+type: field
+Metadata fields:
+- name: string
+Each key in spec mapping represents name of field.
+
+Spec fields:
+- type: 'string'
+- regex: string (valid regex string)
+
+Example:
+```yaml
+type: field
+metadata:
+  name: login
+spec:
+  type: string
+  regex: '^[\w_]4,100}$'
+```
+#### Feature
+type: feature
+Metadata fields:
+- name: string
+
+Each key in spec mapping represents name of field.
+Different types have different configuration options.
+
+Field types and their spec fields
+
+- type: string
+  value: string (any string)
+- type: uint
+  value: number (unsigned integer number)
+- type: int
+  value: number (signed integer number)
+- type: float
+  value: number (number with floating point)
+- type: link
+  value: string (http link)
+- type: email
+  value: string
+- type: regex
+  value: string (valid regex string)
+- type: date
+  value: string (date string according to [RFC3339](https://datatracker.ietf.org/doc/html/rfc3339#section-5.6))
+- type: time
+  value: string (time string according to [RFC3339](https://datatracker.ietf.org/doc/html/rfc3339#section-5.6))
+- type: datetime
+  value: string (date-time string according to [RFC3339](https://datatracker.ietf.org/doc/html/rfc3339#section-5.6))
+- type: duration
+  value: string (duration string according to [RFC3339](https://datatracker.ietf.org/doc/html/rfc3339#section-5.6))
+- type: uuid
+  value: string (valid uuid string according to [RFC4122](https://datatracker.ietf.org/doc/html/rfc4122))
+
+Example:
+```yaml
+type: feature
+metadata:
+  name: somrt
+spec:
+  someting:
+    type: date
+    value: '2023-02-01'
+  another:
+    type: link
+    value: https://google.com
+  asd:
+    type: string
+    value: 'test string'
+```
