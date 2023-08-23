@@ -124,18 +124,20 @@ techspec validate tech-spec
     9 |     helperMessage: null
 
 
-### Types of spec
+## Types of spec
 - form
 - field
 - DesignSystem
 - feature
 
-#### Form
+### Form
 type: form
+
 Metadata fields:
 - name: string
 
 Each key in spec mapping represents name of field.
+
 Field mapping keys:
 - required: boolean
 - errorMessage: string | null
@@ -160,10 +162,12 @@ spec:
     errorMessage: 'Invalid'
     helperMessage: null
 ```
-#### Field
+### Field
 type: field
+
 Metadata fields:
 - name: string
+
 Each key in spec mapping represents name of field.
 
 Spec fields:
@@ -179,39 +183,53 @@ spec:
   type: string
   regex: '^[\w_]4,100}$'
 ```
-#### Feature
+### Feature
 type: feature
+
 Metadata fields:
 - name: string
 
 Each key in spec mapping represents name of field.
+
 Different types have different configuration options.
 
 Field types and their spec fields
 
 - type: string
+
   value: string (any string)
 - type: uint
+
   value: number (unsigned integer number)
 - type: int
+
   value: number (signed integer number)
 - type: float
+
   value: number (number with floating point)
 - type: link
+
   value: string (http link)
 - type: email
+
   value: string
 - type: regex
+
   value: string (valid regex string)
 - type: date
+
   value: string (date string according to [RFC3339](https://datatracker.ietf.org/doc/html/rfc3339#section-5.6))
 - type: time
+
   value: string (time string according to [RFC3339](https://datatracker.ietf.org/doc/html/rfc3339#section-5.6))
 - type: datetime
+
   value: string (date-time string according to [RFC3339](https://datatracker.ietf.org/doc/html/rfc3339#section-5.6))
 - type: duration
+
   value: string (duration string according to [RFC3339](https://datatracker.ietf.org/doc/html/rfc3339#section-5.6))
 - type: uuid
+
   value: string (valid uuid string according to [RFC4122](https://datatracker.ietf.org/doc/html/rfc4122))
 
 Example:
