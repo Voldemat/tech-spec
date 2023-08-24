@@ -13,6 +13,22 @@ npm install -g tech-spec
 
 ## Usage example
 
+techs-spec/some-feature.tech-spec.yaml
+```yaml
+type: feature
+metadata:
+  name: somrt
+spec:
+  someting:
+    type: date
+    value: '2023-02-01'
+  another:
+    type: link
+    value: https://google.com
+  asd:
+    type: string
+    value: 'test string'
+```
 tech-spec/login.field.tech-spec.yaml
 ```yaml
 type: field
@@ -78,6 +94,24 @@ export const RegistrationForm = {
       type: "string",
       regex: new RegExp("^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9]){5;150}$")
     }
+  }
+};
+
+```
+output/features.ts
+```typescript
+export const somrtFeature = {
+  someting: {
+    type: "date",
+    value: new Date("2023-02-01")
+  },
+  another: {
+    type: "link",
+    value: new URL("https://google.com")
+  },
+  asd: {
+    type: "string",
+    value: "adsa"
   }
 };
 
