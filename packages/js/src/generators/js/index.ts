@@ -23,7 +23,7 @@ export class AstFactory {
         specCodeEntries.forEach(([type, code]) => {
             const codeAst: Record<string, any> = acorn.parse(
                 code,
-                { ecmaVersion: 7, ranges: false, sourceType: 'module' }
+                { ecmaVersion: 2022, ranges: false, sourceType: 'module' }
             )
             const finalAst = nestedOmit(
                 codeAst,
