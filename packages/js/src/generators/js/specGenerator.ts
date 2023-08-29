@@ -19,8 +19,10 @@ export class CodeToSpecGenerator {
 
     getForms (ast?: Record<string, any>): Form[] {
         if (ast === undefined) return []
-        return ast.body[0].declaration.declarations.map(
-            (form: Record<string, any>) => this.genForm(form)
+        return ast.body.map(
+            (decl: Record<string, any>) => (
+                this.genForm(decl.declaration.declarations[0])
+            )
         )
     }
 

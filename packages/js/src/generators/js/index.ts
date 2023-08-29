@@ -27,13 +27,7 @@ export class AstFactory {
             )
             const finalAst = nestedOmit(
                 codeAst,
-                [
-                    'specifiers',
-                    'source',
-                    'start',
-                    'end',
-                    'raw'
-                ]
+                ['specifiers', 'source', 'start', 'end', 'raw']
             )
             specAst[type] = finalAst
         })
@@ -121,7 +115,8 @@ export class AstFactory {
         )
     }
 
-    genFeaturesAstFile (features: Feature[]): Record<string, any> {
+    genFeaturesAstFile (features: Feature[]): Record<string, any> | undefined {
+        if (features.length === 0) return undefined
         return this.baseAstFactory.buildProgram(
             features.map(feature => this.genFeatureAst(feature))
         )
