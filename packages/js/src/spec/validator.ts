@@ -44,6 +44,15 @@ export class SpecValidator {
                 indent: 4
             })
         }
+        if (data.type === 'field') {
+            const regex: string = data.spec.regex
+            if (regex.includes('(?<')) {
+                return (
+                    `Field:${String(data.metadata.name)}: ` +
+                    'Regex cannot contain lookbehind assertions'
+                )
+            }
+        }
         return null
     }
 
