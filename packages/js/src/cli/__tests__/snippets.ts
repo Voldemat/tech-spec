@@ -23,12 +23,14 @@ spec:
     fieldRef: password
     required: true
     errorMessage: 'Invalid'
+    placeholder: 'password'
 `
 export const formExpectedCode = `export const RegistrationForm = {
   login: {
     required: true,
     fieldRef: "login",
     errorMessage: null,
+    placeholder: null,
     helperMessage: null,
     field: {
       type: "string",
@@ -40,6 +42,7 @@ export const formExpectedCode = `export const RegistrationForm = {
     fieldRef: "password",
     required: true,
     errorMessage: "Invalid",
+    placeholder: "password",
     helperMessage: null,
     field: {
       type: "string",

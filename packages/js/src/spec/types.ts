@@ -40,7 +40,9 @@ export interface FormFieldSpec {
     field: Field
     fieldRef: string
     required: boolean
+    placeholder: string | null
     errorMessage: string | null
+    helperMessage: string | null
 }
 export type FormSpec = Record<string, FormFieldSpec>
 export interface Form {
