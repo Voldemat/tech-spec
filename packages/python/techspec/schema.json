@@ -175,18 +175,7 @@
                   "name"
                 ]
               },
-              "spec": {"$ref": "#/$defs/feature:spec"}
-            },
-            "required": [
-              "type",
-              "metadata",
-              "spec"
-            ],
-            "additionalProperties": false
-          }
-    ],
-    "$defs": {
-        "feature:spec": {
+              "spec": {
                 "type": "object",
                 "patternProperties": {
                   ".*": {
@@ -351,5 +340,13 @@
                   }
                 }
               }
-    }
+            },
+            "required": [
+              "type",
+              "metadata",
+              "spec"
+            ],
+            "additionalProperties": false
+          }
+    ]
 }
