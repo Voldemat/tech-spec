@@ -14,6 +14,7 @@ def test_validate_valid_spec(tmpdir: Path) -> None:
             login:
                 required: true
                 fieldRef: login
+                placeholder: null
                 errorMessage: null
                 helperMessage: null
         """
@@ -92,6 +93,7 @@ def test_validate_invalid_schema_file(tmpdir: Path) -> None:
                 required: true
                 helperMessage: 1
                 errorMessage: null
+                placeholder: null
                 regex: '$.{5,10}^'
         """
     )

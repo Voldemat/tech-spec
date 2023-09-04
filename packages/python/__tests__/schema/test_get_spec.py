@@ -14,6 +14,7 @@ def test_get_spec(tmpdir: Path) -> None:
             login:
                 required: true
                 fieldRef: login
+                placeholder: null
                 errorMessage: null
                 helperMessage: null
         """
@@ -56,7 +57,8 @@ def test_get_spec(tmpdir: Path) -> None:
                         }
                     },
                     "error_message": null,
-                    "helper_message": null
+                    "helper_message": null,
+                    "placeholder": null
                 }
             }
         }

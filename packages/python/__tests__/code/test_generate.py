@@ -14,6 +14,7 @@ def test_generate(tmpdir: Path, tmpdir2: Path) -> None:
             login:
                 required: true
                 fieldRef: login
+                placeholder: null
                 errorMessage: null
                 helperMessage: null
         """

@@ -51,6 +51,7 @@ class SchemaService:
                                     fieldRef=v["fieldRef"],
                                     field=fields[v["fieldRef"]],
                                     helper_message=v["helperMessage"],
+                                    placeholder=v["placeholder"],
                                     error_message=v["errorMessage"],
                                 )
                                 for k, v in spec["spec"].items()

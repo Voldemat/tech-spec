@@ -40,6 +40,7 @@ class FormFieldDTO:
     field: FIELD_DTO
     error_message: str | None
     helper_message: str | None
+    placeholder: str | None
 
 
 FORM_DTO = SpecDTO[Literal["form"], FormMetadataDTO, dict[str, FormFieldDTO]]
