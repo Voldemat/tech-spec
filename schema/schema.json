@@ -29,15 +29,20 @@
                         ".*": {
                             "type": "object",
                             "properties": {
+                                "fieldRef": {
+                                    "type": "string"
+                                },
                                 "required": {
                                     "type": "boolean",
                                     "default": true
                                 },
-                                "fieldRef": {
-                                    "type": "string"
+                                "placeholder": {
+                                    "type": ["string", "null"],
+                                    "default": null
                                 },
                                 "errorMessage": {
-                                    "type": ["string", "null"]
+                                    "type": ["string", "null"],
+                                    "default": null
                                 },
                                 "helperMessage": {
                                     "type": ["string", "null"],
@@ -48,6 +53,7 @@
                                 "fieldRef",
                                 "errorMessage",
                                 "required",
+                                "placeholder",
                                 "helperMessage"
                             ]
                         }
