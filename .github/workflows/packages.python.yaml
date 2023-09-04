@@ -23,8 +23,7 @@ jobs:
       - name: Install dependencies
         working-directory: ${{env.working-directory}}
         run: |
-          python3 -m pip install --upgrade pip
-          python3 -m pip install pipenv==2023.2.18
+          python3 -m pip install --upgrade pip pipenv
           python3 -m pipenv install --dev --system
       - name: Lint
         working-directory: ${{env.working-directory}}
