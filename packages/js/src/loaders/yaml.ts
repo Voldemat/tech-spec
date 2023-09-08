@@ -1,4 +1,4 @@
-import { load, type YAMLException } from 'js-yaml'
+import { loadAll, type YAMLException } from 'js-yaml'
 import type { FsUtils } from '../cli/fsUtils'
 import type { ILoaderResult, ILoader } from '../types'
 
@@ -7,9 +7,8 @@ export class YamlLoader implements ILoader {
     load (filepath: string): ILoaderResult {
         const content = this.fsUtils.readFile(filepath)
         try {
-            const data = load(content) as Record<string, any>
             return {
-                data,
+                data: loadAll(content) as Array<Record<string, any>>,
                 error: null
             }
         } catch (error: any) {

@@ -1,11 +1,11 @@
 import type {
     DesignSystem,
     Feature,
-    FeatureFieldSpec,
     Form,
-    FormFieldSpec,
     TechSpecContainer
 } from '../../spec/types'
+import type { FeatureFieldSpec } from '../../spec/types/feature'
+import type { FormFieldSpec } from '../../spec/types/forms'
 import type { TechSpecAst } from '../types'
 
 export class CodeToSpecGenerator {
@@ -95,16 +95,10 @@ export class CodeToSpecGenerator {
 
     genFormField (ast: Record<string, any>): [string, FormFieldSpec] {
         const value = this.genObject(ast) as FormFieldSpec
-        value.field = {
-            type: 'field',
-            metadata: {
-                name: value.fieldRef
-            },
-            spec: value.field as any
-        }
         return [ast.key.name, value]
     }
 
+    /* eslint-disable max-lines-per-function */
     genObject (ast: Record<string, any>): Record<string, any> {
         return Object.fromEntries(
             ast.value.properties.map((property: any) => {
@@ -120,6 +114,11 @@ export class CodeToSpecGenerator {
                     return [
                         property.key.name, property.value.arguments[0].value
                     ]
+                } else if (property.value.type === 'ArrayExpression') {
+                    return [
+                        property.key.name,
+                        property.value.elements.map((el: any) => el.value)
+                    ]
                 } else {
                     throw new Error(
                         'Unhandled property value type: ' +
@@ -129,6 +128,7 @@ export class CodeToSpecGenerator {
             })
         )
     }
+    /* eslint-enable max-lines-per-function */
 
     genDesignSystem (ast: Record<string, any>): DesignSystem {
         return {

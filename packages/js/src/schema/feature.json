@@ -1,0 +1,190 @@
+{
+    "$id": "http://example.com/feature.json",
+    "properties": {
+      "type": {
+        "const": "feature"
+      },
+      "metadata": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "name"
+        ]
+      },
+      "spec": {
+        "type": "object",
+        "patternProperties": {
+          ".*": {
+            "type": "object",
+            "discriminator": {
+              "propertyName": "type"
+            },
+            "required": [
+              "type"
+            ],
+            "oneOf": [
+              {
+                "properties": {
+                  "type": {
+                    "const": "string"
+                  },
+                  "value": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "type",
+                  "value"
+                ],
+                "additionalProperties": false
+              },
+              {
+                "properties": {
+                  "type": {
+                    "const": "int"
+                  },
+                  "value": {
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "type",
+                  "value"
+                ],
+                "additionalProperties": false
+              },
+              {
+                "properties": {
+                  "type": {
+                    "const": "float"
+                  },
+                  "value": {
+                    "type": "number"
+                  }
+                },
+                "required": [
+                  "type",
+                  "value"
+                ],
+                "additionalProperties": false
+              },
+              {
+                "properties": {
+                  "type": {
+                    "const": "uint"
+                  },
+                  "value": {
+                    "type": "integer",
+                    "minimum": 0
+                  }
+                },
+                "required": [
+                  "type",
+                  "value"
+                ],
+                "additionalProperties": false
+              },
+              {
+                "properties": {
+                  "type": {
+                    "const": "link"
+                  },
+                  "value": {
+                    "type": "string",
+                    "format": "uri"
+                  }
+                }
+              },
+              {
+                "properties": {
+                   "type": {
+                      "const": "email"
+                  },
+                  "value": {
+                      "type": "string",
+                        "format": "email"
+                  }
+                }
+              },
+              {
+                  "properties": {
+                      "type": {
+                          "const": "regex"
+                      },
+                        "value": {
+                          "type": "string",
+                            "format": "regex"
+                      }
+                  }
+              },
+              {
+                "properties": {
+                  "type": {
+                    "const": "date"
+                  },
+                  "value": {
+                      "type": "string",
+                        "format": "date"
+                  }
+                }
+              },
+              {
+                  "properties": {
+                      "type": {
+                          "const": "time"
+                      },
+                        "value": {
+                          "type": "string",
+                            "format": "time"
+                      }
+                  }
+              },
+              {
+                "properties": {
+                  "type": {
+                        "const": "datetime"
+                  },
+                  "value": {
+                    "type": "string",
+                    "format": "date-time"
+                  }
+                }
+              },
+              {
+                "properties": {
+                  "type": {
+                    "const": "duration"
+                  },
+                  "value": {
+                       "type": "string",
+                        "format": "duration"
+                  }
+                }
+              },
+              {
+                "properties": {
+                  "type": {
+                    "const": "uuid"
+                  },
+                  "value": {
+                      "type": "string",
+                        "format": "uuid"
+                  }
+                }
+              }
+            ]
+          }
+        }
+      }
+    },
+    "required": [
+      "type",
+      "metadata",
+      "spec"
+    ],
+    "additionalProperties": false
+}

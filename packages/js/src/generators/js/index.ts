@@ -1,20 +1,24 @@
 import acorn from 'acorn'
 import type {
     DesignSystem,
-    DesignSystemSpec,
     Feature,
-    FeatureFieldSpec,
-    Field,
-    Form,
-    FormFieldSpec,
     TechSpecContainer
 } from '../../spec/types'
+import type { DesignSystemSpec } from '../../spec/types/designSystem'
+import type { FeatureFieldSpec } from '../../spec/types/feature'
 import type { SpecCode, TechSpecAst } from '../types'
 import type { BaseAstFactory } from './base'
+import { FormAstFactory } from './formAstFactory'
 import { nestedOmit } from './utils'
 
 export class AstFactory {
-    constructor (private readonly baseAstFactory: BaseAstFactory) {}
+    private readonly formAstFactory: FormAstFactory
+    constructor (
+        private readonly baseAstFactory: BaseAstFactory
+    ) {
+        this.formAstFactory = new FormAstFactory(baseAstFactory)
+    }
+
     fromCode (specCode: SpecCode): TechSpecAst {
         const specAst: Partial<TechSpecAst> = {}
         const specCodeEntries = (
@@ -38,7 +42,7 @@ export class AstFactory {
         spec: TechSpecContainer
     ): TechSpecAst {
         const techSpecAst: TechSpecAst = {}
-        const formsAst = this.genFormsAstFile(spec.forms)
+        const formsAst = this.formAstFactory.genFormsAstFile(spec.forms)
         if (formsAst !== undefined) {
             techSpecAst.form = formsAst
         }
@@ -129,6 +133,7 @@ export class AstFactory {
         return this.baseAstFactory.buildExportDeclaration(
             this.baseAstFactory.buildVariable(
                 'const',
+                // eslint-disable-next-line
                 feature.metadata.name + 'Feature',
                 this.baseAstFactory.buildObjectExpression(
                     fields.map(
@@ -176,70 +181,5 @@ export class AstFactory {
                 )
             ])
         )
-    }
-
-    genFormsAstFile (forms: Form[]): Record<string, any> | undefined {
-        if (forms.length === 0) return undefined
-        return this.baseAstFactory.buildProgram(
-            forms.map(form => this.genFormAst(form))
-        )
-    }
-
-    genFormAst (form: Form): Record<string, any> {
-        const formFields = Object.keys(form.spec)
-        const fieldsEntries = formFields.map(
-            (fieldName): [string, FormFieldSpec] => {
-                return [fieldName, form.spec[fieldName]]
-            }
-        )
-        return this.buildFormAst(form.metadata.name, fieldsEntries)
-    }
-
-    buildFormAst (
-        formName: string, fields: Array<[string, FormFieldSpec]>
-    ): Record<string, any> {
-        return this.baseAstFactory.buildExportDeclaration(
-            this.baseAstFactory.buildVariable(
-                'const',
-                formName + 'Form',
-                this.baseAstFactory.buildObjectExpression(
-                    fields.map(
-                        ([name, field]) => (
-                            this.buildFormFieldAst(name, field)
-                        )
-                    )
-                )
-            )
-        )
-    }
-
-    buildFormFieldAst (
-        name: string, field: FormFieldSpec
-    ): Record<string, any> {
-        const fieldKeys = Object.keys(field) as Array<(keyof FormFieldSpec)>
-        return this.baseAstFactory.buildProperty(
-            name,
-            this.baseAstFactory.buildObjectExpression(
-                fieldKeys.map(fieldKey => {
-                    return this.baseAstFactory.buildProperty(
-                        fieldKey,
-                        this.buildFormFieldValue(field[fieldKey])
-                    )
-                })
-            )
-        )
-    }
-
-    buildFormFieldValue (value: string | boolean | Field | null): any {
-        if (!(value instanceof Object)) return { type: 'Literal', value }
-        return this.baseAstFactory.buildObjectExpression([
-            this.baseAstFactory.buildProperty(
-                'type', this.baseAstFactory.buildLiteral(value.spec.type)
-            ),
-            this.baseAstFactory.buildProperty(
-                'regex', this.baseAstFactory.buildNewExpression(
-                    'RegExp', [value.spec.regex]
-                ))
-        ])
     }
 }

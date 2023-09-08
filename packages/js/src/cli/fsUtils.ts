@@ -19,10 +19,7 @@ export class FsUtils {
 
     toAbsolutePath (relativePath: string): string {
         if (relativePath.startsWith('/')) return relativePath
-        if (process.env.PWD == null) {
-            throw new Error('PWD End is not defined')
-        }
-        return path.join(process.env.PWD, relativePath)
+        return path.join(process.cwd(), relativePath)
     }
 
     getTypeFromFilePath (filepath: string): TechSpec['type'] | null {
@@ -52,6 +49,7 @@ export class FsUtils {
             filename = 'features'
             break
         default:
+            // eslint-disable-next-line
             throw new Error(`Unhandled spec type ${type}`)
         }
         return path.join(outpurDir, filename + '.ts')

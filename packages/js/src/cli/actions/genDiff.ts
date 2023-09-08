@@ -1,6 +1,5 @@
-import type { ActionResult } from '../../types'
+import type { ActionResult, IAction } from '../../types'
 import type { AstFactory } from '../../generators/js'
-import type { IAction } from '../../spec/types'
 import type { SpecUtils } from '../utils'
 import type { CodeToSpecGenerator } from '../../generators/js/specGenerator'
 import type { FsUtils } from '../fsUtils'

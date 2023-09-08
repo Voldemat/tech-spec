@@ -71,6 +71,7 @@ describe('CLI:gen-diff', () => {
             const output = await runCLI(
                 `gen-diff ${techSpecFolder} ${outputFolder}`
             )
+            expect(output.stderr).toBe('')
             expect(output.failed).toBe(false)
             expect(output.exitCode).toBe(0)
             expect(output.stdout).toBe(

@@ -2,8 +2,9 @@ import lodash from 'lodash'
 import * as emojis from 'node-emoji'
 import chalk from 'chalk'
 import { type Command } from 'commander'
-import type { IAction, TechSpecContainer } from '../spec/types'
+import type { TechSpecContainer } from '../spec/types'
 import {
+    type IAction,
     type ActionResult,
     type ILoaderErrorResult,
     type ILoaderSuccessResult
@@ -31,7 +32,7 @@ const buildParsingError = (messages: string[]): ResultError<ActionResult> => {
         }
     }
 }
-
+/* eslint-disable */
 export class SpecUtils {
     constructor (
         private readonly fsUtils: FsUtils,
@@ -62,9 +63,15 @@ export class SpecUtils {
         if (parsingErrorsArray.length !== 0) {
             return buildParsingError(parsingErrorsArray)
         }
+        const array = parsingArray
+            .filter((d): d is ILoaderSuccessResult => d.data !== null)
+            .reduce(
+                (acc, d) => [...acc, ...d.data],
+                [] as Array<Record<string, any>>
+            )
         return {
             ok: true,
-            data: (parsingArray as ILoaderSuccessResult[]).map(r => r.data)
+            data: array
         }
     }
 

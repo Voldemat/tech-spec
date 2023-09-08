@@ -4,7 +4,7 @@ export interface ActionResult {
 }
 export const FILE_SPEC_EXTENSION = '.tech-spec.yaml'
 export interface ILoaderSuccessResult {
-    data: Record<string, any>
+    data: Array<Record<string, any>>
     error: null
 }
 export interface ILoaderErrorResult {
@@ -14,4 +14,7 @@ export interface ILoaderErrorResult {
 export type ILoaderResult = ILoaderErrorResult | ILoaderSuccessResult
 export interface ILoader {
     load: (filepath: string) => ILoaderResult
+}
+export interface IAction {
+    run: (...args: any) => ActionResult
 }

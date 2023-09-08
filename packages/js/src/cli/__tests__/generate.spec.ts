@@ -66,6 +66,7 @@ describe('CLI:generate', () => {
             const output = await runCLI(
                 `generate ${techSpecFolder} ${outputFolder}`
             )
+            expect(output.stderr).toBe('')
             expect(output.failed).toBe(false)
             expect(output.exitCode).toBe(0)
             expect(output.stdout).toBe(

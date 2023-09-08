@@ -1,0 +1,48 @@
+{
+    "$id": "http://example.com/field.json",
+    "properties": {
+        "type": {
+            "const": "field"
+        },
+        "metadata": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "name"
+            ]
+        },
+        "spec": {
+            "type": "object",
+            "discriminator": {
+                "propertyName": "type"
+            },
+            "required": ["type"],
+            "oneOf": [
+                {
+                    "type": "object",
+                    "properties": {
+                        "type": {
+                            "const": "string"
+                        },
+                        "regex": {
+                            "type": "string",
+                            "format": "regex"
+                        }
+                    },
+                    "required": ["type", "regex"]
+                }
+            ]
+        }
+
+    },
+    "required": [
+        "type",
+        "metadata",
+        "spec"
+    ],
+    "additionalProperties": false
+}

@@ -84,4 +84,13 @@ export class BaseAstFactory {
             value: v
         }
     }
+
+    buildArrayExpression (
+        elements: Array<Record<string, any>>
+    ): Record<string, any> {
+        return {
+            type: 'ArrayExpression',
+            elements
+        }
+    }
 }

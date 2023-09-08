@@ -1,15 +1,21 @@
 import Ajv, { type ValidateFunction } from 'ajv'
 import addFormats from 'ajv-formats'
 import betterAjvErrors from 'better-ajv-errors'
-import techSpecSchema from '../schema.json'
 import type {
     DesignSystem,
     Feature,
-    Field,
+    Type,
     Form,
     TechSpec,
     TechSpecContainer
 } from './types'
+import {
+    mainSchema,
+    formSchema,
+    featureSchema,
+    designSystemSchema,
+    typeSchema
+} from './schemas'
 
 export class SpecValidatorError extends Error {
     messages: string[]
@@ -31,7 +37,12 @@ export class SpecValidator {
             verbose: true
         })
         addFormats(this.ajv)
-        this.schema = this.ajv.compile<boolean>(techSpecSchema)
+        this.schema = this.ajv
+            .addSchema(typeSchema)
+            .addSchema(formSchema)
+            .addSchema(featureSchema)
+            .addSchema(designSystemSchema)
+            .compile<boolean>(mainSchema)
     }
 
     validateOneSpec (data: Record<string, any>): string | null {
@@ -44,11 +55,11 @@ export class SpecValidator {
                 indent: 4
             })
         }
-        if (data.type === 'field') {
+        if (data.type === 'type' && data.spec.type === 'string') {
             const regex: string = data.spec.regex
             if (regex.includes('(?<')) {
                 return (
-                    `Field:${String(data.metadata.name)}: ` +
+                    `Type:${String(data.metadata.name)}: ` +
                     'Regex cannot contain lookbehind assertions'
                 )
             }
@@ -64,11 +75,11 @@ export class SpecValidator {
             throw new SpecValidatorError(errors)
         }
         const specArray = (data as TechSpec[])
-        const fields: Record<string, Field> = Object.fromEntries(
+        const types: Record<string, Type> = Object.fromEntries(
             specArray.filter(
-                (f): f is Field => f.type === 'field'
-            ).map(field => [field.metadata.name, field]))
-        const forms: Form[] = this.mergeForms(specArray, fields)
+                (t): t is Type => t.type === 'type'
+            ).map(t => [t.metadata.name, t]))
+        const forms: Form[] = this.mergeForms(specArray, types)
         const designSystems = specArray.filter(
             (t): t is DesignSystem => t.type === 'DesignSystem'
         )
@@ -82,12 +93,12 @@ export class SpecValidator {
         }
     }
 
-    mergeForms (specArray: TechSpec[], fields: Record<string, Field>): Form[] {
+    mergeForms (specArray: TechSpec[], types: Record<string, Type>): Form[] {
         const errors: string[] = []
         const forms = specArray.filter(
             (form): form is Form => form.type === 'form'
         ).map(form => {
-            const result = this.processForm(fields, form)
+            const result = this.processForm(types, form)
             if (result instanceof Array) {
                 errors.push(...result)
                 return null
@@ -100,18 +111,20 @@ export class SpecValidator {
         return forms
     }
 
-    processForm (fields: Record<string, Field>, form: Form): Form | string[] {
+    processForm (types: Record<string, Type>, form: Form): Form | string[] {
         const errors: string[] = []
         const newForm: Form = JSON.parse(JSON.stringify(form))
         Object.keys(newForm.spec).forEach(fieldName => {
-            const fieldRef = newForm.spec[fieldName].fieldRef
-            if (fieldRef in fields) {
-                newForm.spec[fieldName].field = fields[fieldRef]
+            const typeName = newForm.spec[fieldName].type
+            if (typeName in types) {
+                newForm.spec[fieldName].typeSpec = types[typeName].spec
             } else {
                 errors.push(
+                    // eslint-disable-next-line
                     `Merging Error: form:${newForm.metadata.name}` +
-                    `.spec.${fieldName}.fieldRef:` +
-                    newForm.spec[fieldName].fieldRef +
+                    `.spec.${fieldName}.typeName:` +
+                    // eslint-disable-next-line
+                    typeName +
                     ' does not exists'
                 )
             }

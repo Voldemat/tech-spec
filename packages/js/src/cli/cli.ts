@@ -11,10 +11,10 @@ import { ValidateAction } from './actions/validate'
 import { generateDiffCommand } from './commands/generateDiffCommand'
 import { GenDiffAction } from './actions/genDiff'
 import type { SpecValidator } from '../spec/validator'
-import type { IAction } from '../spec/types'
 import type { CodeToSpecGenerator } from '../generators/js/specGenerator'
 import type { FsUtils } from './fsUtils'
 import type { CodeFactory } from '../generators/js/codeFactory'
+import type { IAction } from '../types'
 
 const packageJson = JSON.parse(
     fs.readFileSync(

@@ -1,5 +1,4 @@
-import type { IAction } from '../../spec/types'
-import type { ActionResult } from '../../types'
+import type { ActionResult, IAction } from '../../types'
 import type { SpecUtils } from '../utils'
 
 export class ValidateAction implements IAction {
