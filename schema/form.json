@@ -1,0 +1,61 @@
+{
+    "$id": "http://example.com/form.json",
+    "properties": {
+        "type": {
+            "const": "form"
+        },
+        "metadata": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "name"
+            ]
+        },
+        "spec": {
+            "type": "object",
+            "patternProperties": {
+                ".*": {
+                    "type": "object",
+                    "properties": {
+                        "type": {
+                            "type": "string"
+                        },
+                        "required": {
+                            "type": "boolean",
+                            "default": true
+                        },
+                        "placeholder": {
+                            "type": ["string", "null"],
+                            "default": null
+                        },
+                        "errorMessage": {
+                            "type": ["string", "null"],
+                            "default": null
+                        },
+                        "helperMessage": {
+                            "type": ["string", "null"],
+                            "default": null
+                        }
+                    },
+                    "required": [
+                        "type",
+                        "errorMessage",
+                        "required",
+                        "placeholder",
+                        "helperMessage"
+                    ]
+                }
+            }
+        }
+    },
+    "required": [
+        "type",
+        "metadata",
+        "spec"
+    ],
+    "additionalProperties": false
+}

@@ -1,0 +1,14 @@
+{
+    "$id": "http://example.com/main.json#",
+    "type": "object",
+    "discriminator": {
+        "propertyName": "type"
+    },
+    "required": ["type"],
+    "oneOf": [
+        {"$ref": "form.json#"},
+        {"$ref": "designSystem.json#"},
+        {"$ref": "feature.json#"},
+        {"$ref": "type.json#"}
+    ]
+}

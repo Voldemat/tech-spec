@@ -1,0 +1,46 @@
+{
+    "$id": "http://example.com/designSystem.json",
+    "properties": {
+        "type": {
+            "const": "DesignSystem"
+        },
+        "metadata": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "name"
+            ]
+        },
+        "spec": {
+            "type": "object",
+            "properties": {
+                "colors": {
+                    "type": "object",
+                    "patternProperties": {
+                        ".*": {
+                            "type": "object",
+                            "patternProperties": {
+                                ".*": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "required": [
+                "colors"
+            ]
+        }
+    },
+    "required": [
+        "type",
+        "metadata",
+        "spec"
+    ],
+    "additionalProperties": false
+}

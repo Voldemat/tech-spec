@@ -1,0 +1,273 @@
+{
+    "$id": "http://example.com/type.json",
+    "$defs": {
+        "fileSize": {
+            "type": ["object", "null"],
+            "properties": {
+                "unit": {
+                    "type": "string",
+                    "enum": ["b", "kb", "mb", "gb"]
+                },
+                "value": {
+                    "type": "number"
+                }
+            },
+            "required": ["unit", "value"],
+            "additionalProperties": false
+        }
+    },
+    "properties": {
+        "type": {
+            "const": "type"
+        },
+        "metadata": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string"
+                }
+            },
+            "required": ["name"]
+        },
+        "spec": {
+            "type": "object",
+            "discriminator": {
+                "propertyName": "type"
+            },
+            "required": [
+                "type"
+            ],
+            "oneOf": [
+                {
+                    "properties": {
+                        "type": {
+                            "const": "string"
+                        },
+                        "regex": {
+                            "type": ["string", "null"],
+                            "format": "regex",
+                            "default": null
+                        }
+                    },
+                    "required": [
+                        "type",
+                        "regex"
+                    ],
+                    "additionalProperties": false
+                },
+                {
+                    "properties": {
+                        "type": {
+                            "const": "int"
+                        },
+                        "min": {
+                            "type": ["integer", "null"],
+                            "default": null
+                        },
+                        "max": {
+                            "type": ["integer", "null"],
+                            "default": null
+                        }
+                    },
+                    "required": [
+                        "type",
+                        "min",
+                        "max"
+                    ],
+                    "additionalProperties": false
+                },
+                {
+                    "properties": {
+                        "type": {
+                            "const": "float"
+                        },
+                        "min": {
+                            "type": ["number", "null"],
+                            "default": null
+                        },
+                        "max": {
+                            "type": ["number", "null"],
+                            "default": null
+                        }
+                    },
+                    "required": [
+                        "type",
+                        "min",
+                        "max"
+                    ],
+                    "additionalProperties": false
+                },
+                {
+                    "properties": {
+                        "type": {
+                            "const": "date"
+                        },
+                        "allowOnly": {
+                            "type": ["string", "null"],
+                            "enum": ["past", "future"],
+                            "default": null
+                        }
+                    },
+                    "required": ["type", "allowOnly"],
+                    "additionalProperties": false
+                },
+                {
+                    "properties": {
+                        "type": {
+                            "const": "time"
+                        },
+                        "allowOnly": {
+                            "type": ["string", "null"],
+                            "enum": ["past", "future"],
+                            "default": null
+                        }
+                    },
+                    "required": ["type", "allowOnly"],
+                    "additionalProperties": false
+                },
+                {
+                    "properties": {
+                        "type": {
+                            "const": "datetime"
+                        },
+                        "allowOnly": {
+                            "type": ["string", "null"],
+                            "enum": ["past", "future"],
+                            "default": null
+                        }
+                    },
+                    "required": ["type", "allowOnly"],
+                    "additionalProperties": false
+                },
+                {
+                    "properties": {
+                        "type": {
+                            "const": "union"
+                        },
+                        "types": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "required": ["type", "types"],
+                    "additionalProperties": false
+                },
+                {
+                    "properties": {
+                        "type": {
+                            "const": "file"
+                        },
+                        "allowedMimeTypes": {
+                            "type": ["array", "null"],
+                            "items": {
+                                "type": "string"
+                            },
+                            "default": null
+                        },
+                        "maxSize": {
+                            "$ref": "#/$defs/fileSize",
+                            "default": null
+                        },
+                        "minSize": {
+                            "$ref": "#/$defs/fileSize",
+                            "default": null
+                        }
+                    },
+                    "required": ["type", "allowedMimeTypes", "maxSize"],
+                    "additionalProperties": false
+                },
+                {
+                    "properties": {
+                        "type": {
+                            "const": "image"
+                        },
+                        "allowedTypes": {
+                            "type": ["array", "null"],
+                            "items": {
+                                "type": "string",
+                                "enum": ["jpeg", "png", "webp", "svg"]
+                            },
+                            "default": null
+                        },
+                        "maxSize": {
+                            "type": ["object", "null"],
+                            "default": null,
+                            "$ref": "#/$defs/fileSize"
+                        },
+                        "minSize": {
+                            "type": ["object", "null"],
+                            "default": null,
+                            "$ref": "#/$defs/fileSize"
+                        },
+                        "maxWidth": {
+                            "type": ["integer", "null"],
+                            "default": null
+                        },
+                        "minWidth": {
+                            "type": ["integer", "null"],
+                            "default": null
+                        },
+                        "maxHeight": {
+                            "type": ["integer", "null"],
+                            "default": null
+                        },
+                        "minHeight": {
+                            "type": ["integer", "null"],
+                            "default": null
+                        },
+                        "aspectRatio": {
+                            "type": ["object", "null"],
+                            "properties": {
+                                "width": {
+                                    "type": "integer",
+                                    "min": 1
+                                },
+                                "height": {
+                                    "type": "integer",
+                                    "min": 1
+                                }
+                            },
+                            "required": ["width", "height"],
+                            "default": "null"
+                        }
+                    },
+                    "required": [
+                        "type",
+                        "allowedTypes",
+                        "maxSize",
+                        "minSize",
+                        "maxWidth",
+                        "maxHeight",
+                        "minWidth",
+                        "minHeight",
+                        "aspectRatio"
+                    ],
+                    "additionalProperties": false
+                },
+                {
+                    "properties": {
+                        "type": {
+                            "const": "enum"
+                        },
+                        "itemType": {
+                            "type": "string"
+                        },
+                        "items": {
+                            "type": "array"
+                        }
+                    },
+                    "required": ["type", "itemType", "items"],
+                    "additionalProperties": false
+                }
+            ]
+        }
+    },
+    "required": [
+        "type",
+        "metadata",
+        "spec"
+    ],
+    "additionalProperties": false
+}
