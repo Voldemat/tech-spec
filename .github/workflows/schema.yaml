@@ -22,4 +22,4 @@ jobs:
         run: npm install -g ajv-cli
       - name: Validate schema
         working-directory: ${{env.working-directory}}
-        run: ajv compile -s './*.json' --strict=false
+        run: ajv compile -s './**/*.json' --strict=false
