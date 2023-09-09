@@ -1,7 +1,7 @@
 import type { TypeSpec } from '../spec/types/type'
 
 export interface ValidationFormFieldSpec<T extends TypeSpec> {
-    typeSpec: T
+    typeSpec: T | any
     required: boolean
     errorMessage: string | null
 }
