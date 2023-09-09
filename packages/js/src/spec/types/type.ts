@@ -55,29 +55,34 @@ export interface ImageTypeSpec {
     minHeight: number | null
     aspectRatio: ImageAspectRatio | null
 }
-export type ScalarTypeSpec = (
+export type BaseScalarTypeSpec = (
     StringTypeSpec |
     IntTypeSpec |
     FloatTypeSpec |
     DateTypeSpec |
     TimeTypeSpec |
-    DateTimeTypeSpec |
+    DateTimeTypeSpec
+)
+export type ScalarTypeSpec = (
+    BaseScalarTypeSpec |
     FileTypeSpec |
     ImageTypeSpec
 )
 export interface EnumTypeSpec {
     type: 'enum'
     itemType: string
-    itemTypeSpec: ScalarTypeSpec
+    itemTypeSpec: BaseScalarTypeSpec
+    items: string[]
 }
-export type ScalarTypeSpecWithEnum = ScalarTypeSpec | EnumTypeSpec
+export type BaseScalarTypeSpecWithEnum = BaseScalarTypeSpec | EnumTypeSpec
 export interface UnionTypeSpec {
     type: 'union'
     types: string[]
-    typeSpecs: Record<string, ScalarTypeSpecWithEnum>
+    typeSpecs: Record<string, BaseScalarTypeSpecWithEnum>
 }
 export type TypeSpec = (
-    ScalarTypeSpecWithEnum |
+    ScalarTypeSpec |
+    EnumTypeSpec |
     UnionTypeSpec
 )
 export type Type = BaseTechSpec<'type', TypeMetadata, TypeSpec>

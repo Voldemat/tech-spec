@@ -93,4 +93,8 @@ export class BaseAstFactory {
             elements
         }
     }
+
+    buildPropertyWithLiteral (key: string, value: any): Record<string, any> {
+        return this.buildProperty(key, this.buildLiteral(value))
+    }
 }

@@ -1,86 +1,56 @@
-import type { TypeSpec } from '../spec/types/type'
+import type { ImageTypeSpec, TypeSpec } from '../spec/types/type'
+import {
+    successValidatorResult,
+    type ValidationFormFieldSpec,
+    type ValidatorFunc,
+    type IValidatorResult
+} from './types'
+import {
+    createValidationError,
+    isImageValid,
+    isScalarValueValid
+} from './utils'
 
-export interface ValidationFormFieldSpec {
-    typeSpec: TypeSpec
-    type: string
-    required: boolean
-    errorMessage: string | null
+async function validateImage (
+    value: string | File | null,
+    imageSpec: ImageTypeSpec,
+    errorResult: IValidatorResult,
+    successValidatorResult: IValidatorResult
+): Promise<IValidatorResult> {
+    if (!(value instanceof File)) return errorResult
+    const isValid = await isImageValid(value, imageSpec)
+    return isValid
+        ? successValidatorResult
+        : errorResult
 }
-export type FormValidationSpec = Record<string, ValidationFormFieldSpec>
-export interface ValidatorError {
-  isValid: boolean
-  errorMessage: string | null
-}
-export type ValidatorFunc = (value: string | null) => ValidatorError
-export const successValidatorResult: ValidatorError = {
-    isValid: true,
-    errorMessage: null
-}
-function createValidationError (error: string | null): ValidatorError {
-    return {
-        isValid: false,
-        errorMessage: error
-    }
-}
-function isNumberValueValid (
-    n: number | typeof NaN,
-    min: number | null,
-    max: number | null
-): boolean {
-    return (
-        !Number.isNaN(n) &&
-        (max === null || n < max) &&
-        (min === null || n > min)
-    )
-}
-function isValueValid (v: string, typeSpec: TypeSpec): boolean {
-    switch (typeSpec.type) {
-    case 'string': {
-        return typeSpec.regex.test(v)
-    }
-    case 'int': {
-        return isNumberValueValid(parseInt(v, 10), typeSpec.min, typeSpec.max)
-    }
-    case 'float': {
-        return isNumberValueValid(parseFloat(v), typeSpec.min, typeSpec.max)
-    }
-    default: {
-        throw new Error(`Unhandled type ${JSON.stringify(typeSpec)}`)
-    }
-    }
-}
-export function validateFormField (
-    spec: ValidationFormFieldSpec,
-    v: string | null
-): ValidatorError {
+
+export function buildValidator<T extends ImageTypeSpec> (
+    spec: ValidationFormFieldSpec<T>
+): (value: string | File | null) => Promise<IValidatorResult>
+export function buildValidator<T extends Exclude<TypeSpec, ImageTypeSpec>> (
+    spec: ValidationFormFieldSpec<T>
+): (value: string | File | null) => IValidatorResult
+export function buildValidator<T extends TypeSpec> (
+    spec: ValidationFormFieldSpec<T>
+): ValidatorFunc {
     const errorResult = createValidationError(spec.errorMessage)
-    const isValid = (
-        (!spec.required || v !== null) &&
-        (v === null || isValueValid(v, spec.typeSpec))
-    )
-    if (!isValid) return errorResult
-    return successValidatorResult
-}
-export function buildValidator (spec: ValidationFormFieldSpec): ValidatorFunc {
-    return (v: string | null) => {
-        return validateFormField(spec, v)
+    // eslint-disable-next-line @typescript-eslint/promise-function-async
+    return (value: string | File | null) => {
+        if (spec.required && value === null) return errorResult
+        if (value === null) return errorResult
+        if (spec.typeSpec.type !== 'image') {
+            return (
+                isScalarValueValid(value, spec.typeSpec)
+                    ? successValidatorResult
+                    : errorResult
+            )
+        } else {
+            return validateImage(
+                value,
+                spec.typeSpec,
+                errorResult,
+                successValidatorResult
+            )
+        }
     }
-}
-export type FormValidators<T extends FormValidationSpec> = {
-  [key in keyof T]: ValidatorFunc
-}
-export function buildValidators<T extends FormValidationSpec> (
-    form: T
-): FormValidators<T> {
-    const entries = Object.entries(
-        form
-    ) as Array<[keyof T, ValidationFormFieldSpec]>
-    return entries.reduce<Partial<FormValidators<T>>>(
-        (obj, entry) => {
-            const [key, field] = entry
-            obj[key] = buildValidator(field)
-            return obj
-        },
-        {}
-    ) as FormValidators<T>
 }

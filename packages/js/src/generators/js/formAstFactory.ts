@@ -1,7 +1,9 @@
+/* eslint-disable max-lines */
 import type { Form, FormFieldSpec } from '../../spec/types/forms'
 import type {
     DateTimeTypeSpec,
     DateTypeSpec,
+    EnumTypeSpec,
     FileSize,
     FileTypeSpec,
     FloatTypeSpec,
@@ -10,7 +12,8 @@ import type {
     IntTypeSpec,
     StringTypeSpec,
     TimeTypeSpec,
-    TypeSpec
+    TypeSpec,
+    UnionTypeSpec
 } from '../../spec/types/type'
 import { type BaseAstFactory } from './base'
 
@@ -106,6 +109,14 @@ export class FormAstFactory {
             properties.push(...this.buildFileTypeProperties(value))
             break
         }
+        case 'enum': {
+            properties.push(...this.buildEnumTypeProperties(value))
+            break
+        }
+        case 'union': {
+            properties.push(...this.buildUnionTypeProperties(value))
+            break
+        }
         default: {
             throw new Error(`Unhandled type: ${JSON.stringify(value)}`)
         }
@@ -130,11 +141,11 @@ export class FormAstFactory {
         value: IntTypeSpec | FloatTypeSpec
     ): Array<Record<string, any>> {
         return [
-            this.baseAstFactory.buildProperty(
-                'max', this.baseAstFactory.buildLiteral(value.max)
+            this.baseAstFactory.buildPropertyWithLiteral(
+                'max', value.max
             ),
-            this.baseAstFactory.buildProperty(
-                'min', this.baseAstFactory.buildLiteral(value.min)
+            this.baseAstFactory.buildPropertyWithLiteral(
+                'min', value.min
             )
         ]
     }
@@ -143,8 +154,8 @@ export class FormAstFactory {
         value: DateTypeSpec | TimeTypeSpec | DateTimeTypeSpec
     ): Array<Record<string, any>> {
         return [
-            this.baseAstFactory.buildProperty(
-                'allowOnly', this.baseAstFactory.buildLiteral(value.allowOnly)
+            this.baseAstFactory.buildPropertyWithLiteral(
+                'allowOnly', value.allowOnly
             )
         ]
     }
@@ -160,24 +171,24 @@ export class FormAstFactory {
             this.baseAstFactory.buildProperty(
                 'maxSize', this.buildFileSizeAstValue(value.maxSize)
             ),
-            this.baseAstFactory.buildProperty(
-                'minWidth', this.baseAstFactory.buildLiteral(value.minWidth)
+            this.baseAstFactory.buildPropertyWithLiteral(
+                'minWidth', value.minWidth
             ),
-            this.baseAstFactory.buildProperty(
-                'minHeight', this.baseAstFactory.buildLiteral(value.minHeight)
+            this.baseAstFactory.buildPropertyWithLiteral(
+                'minHeight', value.minHeight
             ),
-            this.baseAstFactory.buildProperty(
-                'maxWidth', this.baseAstFactory.buildLiteral(value.minWidth)
+            this.baseAstFactory.buildPropertyWithLiteral(
+                'maxWidth', value.minWidth
             ),
-            this.baseAstFactory.buildProperty(
-                'maxHeight', this.baseAstFactory.buildLiteral(value.maxHeight)
+            this.baseAstFactory.buildPropertyWithLiteral(
+                'maxHeight', value.maxHeight
             ),
             this.baseAstFactory.buildProperty(
                 'aspectRatio', this.baseAspectRationAstValue(value.aspectRatio)
             ),
-            this.baseAstFactory.buildProperty(
+            this.baseAstFactory.buildPropertyWithLiteral(
                 'allowedTypes',
-                this.baseAstFactory.buildLiteral(value.allowedTypes)
+                value.allowedTypes
             )
         ]
     }
@@ -186,11 +197,11 @@ export class FormAstFactory {
     buildFileSizeAstValue (size: FileSize | null): Record<string, any> {
         if (size === null) return this.baseAstFactory.buildLiteral(size)
         return this.baseAstFactory.buildObjectExpression([
-            this.baseAstFactory.buildProperty(
-                'unit', this.baseAstFactory.buildLiteral(size.unit)
+            this.baseAstFactory.buildPropertyWithLiteral(
+                'unit', size.unit
             ),
-            this.baseAstFactory.buildProperty(
-                'value', this.baseAstFactory.buildLiteral(size.value)
+            this.baseAstFactory.buildPropertyWithLiteral(
+                'value', size.value
             )
         ])
     }
@@ -202,16 +213,15 @@ export class FormAstFactory {
             return this.baseAstFactory.buildLiteral(aspectRatio)
         }
         return this.baseAstFactory.buildObjectExpression([
-            this.baseAstFactory.buildProperty(
-                'width', this.baseAstFactory.buildLiteral(aspectRatio.width)
+            this.baseAstFactory.buildPropertyWithLiteral(
+                'width', aspectRatio.width
             ),
-            this.baseAstFactory.buildProperty(
-                'height', this.baseAstFactory.buildLiteral(aspectRatio.height)
+            this.baseAstFactory.buildPropertyWithLiteral(
+                'height', aspectRatio.height
             )
         ])
     }
 
-    /* eslint-disable max-lines-per-function */
     buildFileTypeProperties (value: FileTypeSpec): Array<Record<string, any>> {
         return [
             this.baseAstFactory.buildProperty(
@@ -220,11 +230,47 @@ export class FormAstFactory {
             this.baseAstFactory.buildProperty(
                 'maxSize', this.buildFileSizeAstValue(value.maxSize)
             ),
-            this.baseAstFactory.buildProperty(
-                'allowedMimeTypes',
-                this.baseAstFactory.buildLiteral(value.allowedMimeTypes)
+            this.baseAstFactory.buildPropertyWithLiteral(
+                'allowedMimeTypes', value.allowedMimeTypes
             )
         ]
     }
-    /* eslint-enable max-lines-per-function */
+
+    buildEnumTypeProperties (
+        value: EnumTypeSpec
+    ): Array<Record<string, any>> {
+        return [
+            this.baseAstFactory.buildPropertyWithLiteral(
+                'itemType', value.itemType
+            ),
+            this.baseAstFactory.buildPropertyWithLiteral(
+                'items', value.items
+            ),
+            this.baseAstFactory.buildProperty(
+                'itemTypeSpec', this.buildTypeSpecValue(value.itemTypeSpec)
+            )
+        ]
+    }
+
+    buildUnionTypeProperties (
+        value: UnionTypeSpec
+    ): Array<Record<string, any>> {
+        return [
+            this.baseAstFactory.buildPropertyWithLiteral(
+                'types', value.types
+            ),
+            this.baseAstFactory.buildProperty(
+                'typeSpecs',
+                this.baseAstFactory.buildObjectExpression(
+                    Object.entries(value.typeSpecs)
+                        .map(([name, tSpec]) => (
+                            this.baseAstFactory.buildProperty(
+                                name,
+                                this.buildTypeSpecValue(tSpec)
+                            )
+                        ))
+                )
+            )
+        ]
+    }
 }

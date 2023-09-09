@@ -9,6 +9,7 @@ import type {
     TechSpec,
     TechSpecContainer
 } from './types'
+import type { TypeSpec, EnumTypeSpec, UnionTypeSpec } from './types/type'
 import {
     mainSchema,
     formSchema,
@@ -66,7 +67,7 @@ export class SpecValidator {
         }
         return null
     }
-
+    /* eslint-disable */
     validate (data: Array<Record<string, any>>): TechSpecContainer {
         const errors = data
             .map(spec => this.validateOneSpec(spec))
@@ -76,9 +77,78 @@ export class SpecValidator {
         }
         const specArray = (data as TechSpec[])
         const types: Record<string, Type> = Object.fromEntries(
-            specArray.filter(
-                (t): t is Type => t.type === 'type'
-            ).map(t => [t.metadata.name, t]))
+            specArray
+                .filter((t): t is Type => t.type === 'type')
+                .map(t => [t.metadata.name, t])
+        )
+        const typesErrors: string[] = []
+        const enums = Object.values(types)
+            .map((t): [string, TypeSpec] => ([t.metadata.name, t.spec]))
+            .filter((item): item is [string, EnumTypeSpec] => item[1].type === 'enum')
+        for (const [name, enumType] of enums) {
+            if (enumType.itemType in types) {
+                const itemType = types[enumType.itemType].spec
+                if (
+                    itemType.type !== 'image' &&
+                    itemType.type !== 'union' &&
+                    itemType.type !== 'file' &&
+                    itemType.type !== 'enum'
+                ) {
+                    enumType.itemTypeSpec = itemType
+                } else {
+                    typesErrors.push(
+                        `Merging Error: type:${name}` +
+                        `.spec.itemType:${enumType.itemType}` +
+                        'is not valid type for enum'
+                    )
+                }
+            } else {
+                typesErrors.push(
+                    `Merging Error: type:${name}` +
+                    `.spec.itemType:${enumType.itemType}` +
+                    ' does not exists'
+                )
+            }
+        }
+        if (typesErrors.length !== 0) {
+            throw new SpecValidatorError(typesErrors)
+        }
+        const unionsErrors: string[] = []
+        const unions = Object.values(types)
+            .map((t): [string, TypeSpec] => ([t.metadata.name, t.spec]))
+            .filter((item): item is [string, UnionTypeSpec] => item[1].type === 'union')
+        for (const [name, unionType] of unions) {
+            if (unionType.typeSpecs === undefined) {
+                unionType.typeSpecs = {}
+            }
+            for (const typeName of unionType.types) {
+                if (typeName in types) {
+                    const itemType = types[typeName].spec
+                    if (
+                        itemType.type !== 'image' &&
+                        itemType.type !== 'union' &&
+                        itemType.type !== 'file'
+                    ) {
+                        unionType.typeSpecs[typeName] = itemType
+                    } else {
+                        typesErrors.push(
+                            `Merging Error: type:${name}` +
+                            `.spec.itemType:${typeName}` +
+                            'is not valid type for union'
+                        )
+                    }
+                } else {
+                    typesErrors.push(
+                        `Merging Error: type:${name}` +
+                        `.spec.itemType:${typeName}` +
+                        ' does not exists'
+                    )
+                }
+            }
+        }
+        if (unionsErrors.length !== 0) {
+            throw new SpecValidatorError(unionsErrors)
+        }
         const forms: Form[] = this.mergeForms(specArray, types)
         const designSystems = specArray.filter(
             (t): t is DesignSystem => t.type === 'DesignSystem'
@@ -92,6 +162,7 @@ export class SpecValidator {
             features
         }
     }
+    /* eslint-enable */
 
     mergeForms (specArray: TechSpec[], types: Record<string, Type>): Form[] {
         const errors: string[] = []

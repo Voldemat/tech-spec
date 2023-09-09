@@ -52,6 +52,14 @@ spec:
     type: AnyDocument
     required: true
     errorMessage: null
+  city:
+    type: citiesEnum
+    required: true
+    errorMessage: null
+  loginAuth:
+    type: loginAuthUnion
+    required: true
+    errorMessage: null
 `
 export const formExpectedCode = `export const RegistrationForm = {
   login: {
@@ -162,6 +170,45 @@ export const formExpectedCode = `export const RegistrationForm = {
       },
       allowedMimeTypes: null
     }
+  },
+  city: {
+    type: "citiesEnum",
+    required: true,
+    errorMessage: null,
+    placeholder: null,
+    helperMessage: null,
+    typeSpec: {
+      type: "enum",
+      itemType: "city",
+      items: ["Moscow","Tashkent"],
+      itemTypeSpec: {
+        type: "string",
+        regex: new RegExp(".{1,30}")
+      }
+    }
+  },
+  loginAuth: {
+    type: "loginAuthUnion",
+    required: true,
+    errorMessage: null,
+    placeholder: null,
+    helperMessage: null,
+    typeSpec: {
+      type: "union",
+      types: ["login","password"],
+      typeSpecs: {
+        login: {
+          type: "string",
+          regex: new RegExp(` +
+            rmTrailingSlashes('"^[\\w_]{4,100}$"') + `)
+        },
+        password: {
+          type: "int",
+          max: 100,
+          min: 1
+        }
+      }
+    }
   }
 };
 `
@@ -250,4 +297,33 @@ spec:
   maxSize:
     unit: kb
     value: 500
+...
+---
+type: type
+metadata:
+  name: city
+spec:
+  type: string
+  regex: '.{1,30}'
+...
+---
+type: type
+metadata:
+  name: citiesEnum
+spec:
+  type: enum
+  itemType: city
+  items:
+    - Moscow
+    - Tashkent
+...
+---
+type: type
+metadata:
+  name: loginAuthUnion
+spec:
+  type: union
+  types:
+    - login
+    - password
 `
