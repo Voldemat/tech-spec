@@ -24,12 +24,12 @@ async function validateImage (
         : errorResult
 }
 
-export function buildValidator<T extends ImageTypeSpec> (
-    spec: ValidationFormFieldSpec<T>
-): (value: string | File | null) => Promise<IValidatorResult>
 export function buildValidator<T extends Exclude<TypeSpec, ImageTypeSpec>> (
     spec: ValidationFormFieldSpec<T>
 ): (value: string | File | null) => IValidatorResult
+export function buildValidator<T extends ImageTypeSpec> (
+    spec: ValidationFormFieldSpec<T>
+): (value: string | File | null) => Promise<IValidatorResult>
 export function buildValidator<T extends TypeSpec> (
     spec: ValidationFormFieldSpec<T>
 ): ValidatorFunc {
