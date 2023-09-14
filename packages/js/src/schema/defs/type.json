@@ -104,7 +104,7 @@
                         },
                         "allowOnly": {
                             "type": ["string", "null"],
-                            "enum": ["past", "future"],
+                            "enum": ["past", "future", null],
                             "default": null
                         }
                     },

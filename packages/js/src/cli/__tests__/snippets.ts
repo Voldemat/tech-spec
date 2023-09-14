@@ -30,6 +30,10 @@ spec:
     required: true
     errorMessage: null
     placeholder: null
+  date:
+    type: justDate
+    required: true
+    errorMessage: null
   eventDate:
     type: futureDate
     required: true
@@ -96,6 +100,17 @@ export const formExpectedCode = `export const RegistrationForm = {
       type: "float",
       max: null,
       min: 0.1
+    }
+  },
+  date: {
+    type: "justDate",
+    required: true,
+    errorMessage: null,
+    placeholder: null,
+    helperMessage: null,
+    typeSpec: {
+      type: "date",
+      allowOnly: null
     }
   },
   eventDate: {
@@ -326,4 +341,11 @@ spec:
   types:
     - login
     - password
+...
+---
+type: type
+metadata:
+  name: justDate
+spec:
+  type: date
 `
