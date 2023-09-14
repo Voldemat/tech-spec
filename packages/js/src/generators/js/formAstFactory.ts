@@ -71,7 +71,9 @@ export class FormAstFactory {
         )
     }
 
-    buildFormFieldValue (value: string | boolean | TypeSpec | null): any {
+    buildFormFieldValue (
+        value: string | boolean | TypeSpec | null | number
+    ): any {
         if (!(value instanceof Object)) {
             return this.baseAstFactory.buildLiteral(value)
         }

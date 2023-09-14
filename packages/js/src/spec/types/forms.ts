@@ -8,6 +8,7 @@ export interface FormFieldSpec {
     placeholder: string | null
     errorMessage: string | null
     helperMessage: string | null
+    maxLength: number | null
 }
 export interface FormMetadata {
     name: string

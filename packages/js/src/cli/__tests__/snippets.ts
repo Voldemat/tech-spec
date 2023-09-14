@@ -19,6 +19,7 @@ spec:
     required: true
     type: login
     errorMessage: null
+    maxLength: 40
 
   password:
     type: password
@@ -70,6 +71,7 @@ export const formExpectedCode = `export const RegistrationForm = {
     required: true,
     type: "login",
     errorMessage: null,
+    maxLength: 40,
     placeholder: null,
     helperMessage: null,
     typeSpec: {
@@ -84,6 +86,7 @@ export const formExpectedCode = `export const RegistrationForm = {
     errorMessage: "Invalid",
     placeholder: "password",
     helperMessage: null,
+    maxLength: null,
     typeSpec: {
       type: "int",
       max: 100,
@@ -96,6 +99,7 @@ export const formExpectedCode = `export const RegistrationForm = {
     errorMessage: null,
     placeholder: null,
     helperMessage: null,
+    maxLength: null,
     typeSpec: {
       type: "float",
       max: null,
@@ -108,6 +112,7 @@ export const formExpectedCode = `export const RegistrationForm = {
     errorMessage: null,
     placeholder: null,
     helperMessage: null,
+    maxLength: null,
     typeSpec: {
       type: "date",
       allowOnly: null
@@ -119,6 +124,7 @@ export const formExpectedCode = `export const RegistrationForm = {
     errorMessage: null,
     placeholder: null,
     helperMessage: null,
+    maxLength: null,
     typeSpec: {
       type: "date",
       allowOnly: "future"
@@ -130,6 +136,7 @@ export const formExpectedCode = `export const RegistrationForm = {
     errorMessage: null,
     placeholder: null,
     helperMessage: null,
+    maxLength: null,
     typeSpec: {
       type: "time",
       allowOnly: "future"
@@ -141,6 +148,7 @@ export const formExpectedCode = `export const RegistrationForm = {
     errorMessage: null,
     placeholder: null,
     helperMessage: null,
+    maxLength: null,
     typeSpec: {
       type: "datetime",
       allowOnly: "future"
@@ -152,6 +160,7 @@ export const formExpectedCode = `export const RegistrationForm = {
     errorMessage: null,
     placeholder: null,
     helperMessage: null,
+    maxLength: null,
     typeSpec: {
       type: "image",
       minSize: null,
@@ -176,6 +185,7 @@ export const formExpectedCode = `export const RegistrationForm = {
     errorMessage: null,
     placeholder: null,
     helperMessage: null,
+    maxLength: null,
     typeSpec: {
       type: "file",
       minSize: null,
@@ -192,6 +202,7 @@ export const formExpectedCode = `export const RegistrationForm = {
     errorMessage: null,
     placeholder: null,
     helperMessage: null,
+    maxLength: null,
     typeSpec: {
       type: "enum",
       itemType: "city",
@@ -208,6 +219,7 @@ export const formExpectedCode = `export const RegistrationForm = {
     errorMessage: null,
     placeholder: null,
     helperMessage: null,
+    maxLength: null,
     typeSpec: {
       type: "union",
       types: ["login","password"],
