@@ -39,6 +39,10 @@
                         "helperMessage": {
                             "type": ["string", "null"],
                             "default": null
+                        },
+                        "maxLength": {
+                            "type": ["integer", "null"],
+                            "default": null
                         }
                     },
                     "required": [
