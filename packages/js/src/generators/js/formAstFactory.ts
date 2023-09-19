@@ -180,7 +180,7 @@ export class FormAstFactory {
                 'minHeight', value.minHeight
             ),
             this.baseAstFactory.buildPropertyWithLiteral(
-                'maxWidth', value.minWidth
+                'maxWidth', value.maxWidth
             ),
             this.baseAstFactory.buildPropertyWithLiteral(
                 'maxHeight', value.maxHeight
