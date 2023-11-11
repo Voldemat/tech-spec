@@ -48,6 +48,9 @@ export class FsUtils {
         case 'feature':
             filename = 'features'
             break
+        case 'type':
+            filename = 'types'
+            break
         default:
             // eslint-disable-next-line
             throw new Error(`Unhandled spec type ${type}`)
@@ -65,11 +68,12 @@ export class FsUtils {
 
     writeGeneratedFiles (
         outputDir: string,
-        files: Array<[TechSpec['type'], string]>
+        files: Array<[TechSpec['type'], string | undefined]>
     ): void {
         outputDir = this.toAbsolutePath(outputDir)
         if (!this.isDirExists(outputDir)) this.createDir(outputDir)
         for (const [type, code] of files) {
+            if (code === undefined) continue
             this.writeToFile(
                 this.genCodeFileName(outputDir, type),
                 code

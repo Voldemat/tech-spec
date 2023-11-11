@@ -1,9 +1,7 @@
 import { type BaseTechSpec } from './base'
-import { type TypeSpec } from './type'
 
 export interface FormFieldSpec {
     type: string
-    typeSpec: TypeSpec
     required: boolean
     placeholder: string | null
     errorMessage: string | null

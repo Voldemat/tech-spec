@@ -1,9 +1,6 @@
 #! /usr/bin/env node
 
-import { AstFactory } from '../generators/js'
-import { BaseAstFactory } from '../generators/js/base'
-import { CodeFactory } from '../generators/js/codeFactory'
-import { CodeToSpecGenerator } from '../generators/js/specGenerator'
+import { CodeFactory, SpecGenerator } from '../generators'
 import { YamlLoader } from '../loaders/yaml'
 import { SpecValidator } from '../spec/validator'
 import { CLI, type CLIContainer } from './cli'
@@ -18,9 +15,8 @@ const container: CLIContainer = {
     specUtils: new SpecUtils(fsUtils, yamlLoader, specValidator),
     specValidator,
     yamlLoader,
-    astFactory: new AstFactory(new BaseAstFactory()),
     codeFactory: new CodeFactory(),
-    specGenerator: new CodeToSpecGenerator()
+    specGenerator: new SpecGenerator()
 }
 export const cli = new CLI(container)
 cli.run()

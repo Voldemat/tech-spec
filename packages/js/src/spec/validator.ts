@@ -159,7 +159,8 @@ export class SpecValidator {
         return {
             designSystems,
             forms,
-            features
+            features,
+            types: Object.values(types)
         }
     }
     /* eslint-enable */
@@ -187,9 +188,7 @@ export class SpecValidator {
         const newForm: Form = JSON.parse(JSON.stringify(form))
         Object.keys(newForm.spec).forEach(fieldName => {
             const typeName = newForm.spec[fieldName].type
-            if (typeName in types) {
-                newForm.spec[fieldName].typeSpec = types[typeName].spec
-            } else {
+            if (!(typeName in types)) {
                 errors.push(
                     // eslint-disable-next-line
                     `Merging Error: form:${newForm.metadata.name}` +

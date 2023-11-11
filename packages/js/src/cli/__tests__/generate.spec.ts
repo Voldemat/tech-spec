@@ -10,7 +10,8 @@ import {
     formExpectedCode,
     formYamlContent,
     loginFieldContent,
-    passwordFieldContent
+    passwordFieldContent,
+    typesExpectedCode
 } from './snippets'
 
 describe('CLI:generate', () => {
@@ -18,6 +19,7 @@ describe('CLI:generate', () => {
     const outputFolder = path.join(os.tmpdir(), 'tech-spec-output-' + uuid4())
     const formPath = path.join(outputFolder, 'forms.ts')
     const designSystemPath = path.join(outputFolder, 'designs.ts')
+    const typesSystemPath = path.join(outputFolder, 'types.ts')
 
     function saveDesignSystemFile (content: string): void {
         fs.writeFileSync(
@@ -79,6 +81,8 @@ describe('CLI:generate', () => {
             expect(formCode).toBe(formExpectedCode)
             const designSystemCode = fs.readFileSync(designSystemPath, 'utf-8')
             expect(designSystemCode).toBe(designSystemExpectedCode)
+            const typesCode = fs.readFileSync(typesSystemPath, 'utf-8')
+            expect(typesCode).toBe(typesExpectedCode)
         }
     )
 })

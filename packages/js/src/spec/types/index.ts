@@ -7,6 +7,7 @@ export interface TechSpecContainer {
     designSystems: DesignSystem[]
     forms: Form[]
     features: Feature[]
+    types: Type[]
 }
 
 export type TechSpec = Form | Feature | Type | DesignSystem
