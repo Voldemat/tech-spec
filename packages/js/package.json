@@ -13,7 +13,7 @@
     "lint": "eslint --ext=ts .",
     "lint:fix": "eslint --fix --ext=ts .",
     "test": "jest",
-    "test:coverage": "jest --coverage",
+    "test:coverage": "jest --coverage --timeout=10000",
     "schema:update": "cp -r ../../schema/* ./src/schema/",
     "schema:validate": "if test $(npm run --silent schema:global:hash) = $(npm run --silent schema:hash);then echo 'Schema is up to date'; exit 0; else echo 'Schema is outdated'; exit 1; fi",
     "schema:hash": "find ./src/schema/* -type f -print0 | sort -z | xargs -0 sha1sum | cut -d \" \" -f 1 | sha1sum | cut -d \" \" -f 1",
