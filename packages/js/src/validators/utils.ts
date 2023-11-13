@@ -1,9 +1,8 @@
 import type {
     FileSize,
-    ImageTypeSpec,
-    TypeSpec
+    ImageTypeSpec
 } from '../spec/types/type'
-import type { IValidatorResult } from './types'
+import type { IValidatorResult, ScalarValidInput } from './types'
 
 export function createUnhandledError (error: never): Error {
     return new Error(error)
@@ -27,6 +26,7 @@ function isNumberValueValid (
         (min === null || n > min)
     )
 }
+
 const timeRegExp = /^([0-1]?[0-9]|2[0-4]):([0-5][0-9])$/
 function isTimeValid (
     time: string, allowOnly: 'future' | 'past' | null
@@ -140,10 +140,11 @@ export async function isImageValid (
         )
     )
 }
+
 // eslint-disable-next-line @typescript-eslint/promise-function-async
 export function isScalarValueValid (
     v: string | File,
-    typeSpec: Exclude<TypeSpec, ImageTypeSpec>
+    typeSpec: ScalarValidInput
 ): boolean {
     switch (typeSpec.type) {
     case 'string': {

@@ -1,4 +1,9 @@
-import type { TypeSpec } from '../spec/types/type'
+import type {
+    EnumTypeSpec,
+    ImageTypeSpec,
+    TypeSpec,
+    UnionTypeSpec
+} from '../spec/types/type'
 
 export interface ValidationFormFieldSpec<T extends TypeSpec> {
     typeSpec: T | any
@@ -19,3 +24,20 @@ export const successValidatorResult: IValidatorResult = {
     isValid: true,
     errorMessage: null
 }
+
+export type ScalarValidInput = Exclude<
+    TypeSpec,
+    ImageTypeSpec | EnumTypeSpec | UnionTypeSpec
+> | EnumCodeTypeSpec | UnionCodeTypeSpec
+
+export type EnumCodeTypeSpec = (
+    EnumTypeSpec & {
+        itemTypeSpec: ScalarValidInput
+    }
+)
+
+export type UnionCodeTypeSpec = (
+    UnionTypeSpec & {
+        typeSpecs: ScalarValidInput[]
+    }
+)
