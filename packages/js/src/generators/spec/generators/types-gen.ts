@@ -32,6 +32,7 @@ export class TypesSpecGenerator extends BaseSpecGenerator<Type> {
                 (t): t is [string, ts.ObjectLiteralExpression] => t !== null
             )
             .map(([typeName, typeValue]) => this.genType(typeName, typeValue))
+
             .sort((t1, t2) => t1.metadata.name.localeCompare(t2.metadata.name))
     }
 

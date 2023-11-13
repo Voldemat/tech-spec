@@ -10,7 +10,8 @@ import {
     formExpectedCode,
     formYamlContent,
     loginFieldContent,
-    passwordFieldContent
+    passwordFieldContent,
+    typesExpectedCode
 } from './snippets'
 
 describe('CLI:gen-diff', () => {
@@ -18,6 +19,7 @@ describe('CLI:gen-diff', () => {
     const outputFolder = path.join(os.tmpdir(), 'tech-spec-output-' + uuid4())
     const formPath = path.join(outputFolder, 'forms.ts')
     const designSystemsPath = path.join(outputFolder, 'designs.ts')
+    const typesPath = path.join(outputFolder, 'types.ts')
 
     function saveDesignSystemFile (content: string): void {
         fs.writeFileSync(
@@ -50,6 +52,9 @@ describe('CLI:gen-diff', () => {
     function saveDesignSystemCodeFile (content: string): void {
         fs.writeFileSync(designSystemsPath, content)
     }
+    function saveTypesCodeFile (content: string): void {
+        fs.writeFileSync(typesPath, content)
+    }
     beforeAll(() => {
         fs.mkdirSync(techSpecFolder)
         fs.mkdirSync(outputFolder)
@@ -68,6 +73,7 @@ describe('CLI:gen-diff', () => {
             saveDesignSystemCodeFile(designSystemExpectedCode)
             saveLoginFieldFile(loginFieldContent)
             savePasswordFieldFile(passwordFieldContent)
+            saveTypesCodeFile(typesExpectedCode)
             const output = await runCLI(
                 `gen-diff ${techSpecFolder} ${outputFolder}`
             )

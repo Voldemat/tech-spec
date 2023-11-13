@@ -196,50 +196,8 @@ export const designSystemExpectedCode = `export const main = {
 } as const;
 `
 export const typesExpectedCode = `\
-export const justDateType = {
-    type: "date",
-    allowOnly: null
-} as const;
-export const cityType = {
-    type: "string",
-    regex: /.{1,30}/
-} as const;
-export const AnyDocumentType = {
-    type: "file",
-    minSize: null,
-    maxSize: {
-        value: 500,
-        unit: "kb"
-    },
-    allowedMimeTypes: null
-} as const;
-export const avatarType = {
-    type: "image",
-    minSize: null,
-    maxSize: {
-        value: 10,
-        unit: "mb"
-    },
-    allowedTypes: ["jpeg", "png", "webp", "svg"],
-    maxWidth: null,
-    minWidth: null,
-    maxHeight: null,
-    minHeight: null,
-    aspectRation: {
-        width: 1,
-        height: 1
-    }
-} as const;
-export const datetimeFutureType = {
-    type: "datetime",
-    allowOnly: "future"
-} as const;
 export const timeFutureType = {
     type: "time",
-    allowOnly: "future"
-} as const;
-export const futureDateType = {
-    type: "date",
     allowOnly: "future"
 } as const;
 export const priceType = {
@@ -255,6 +213,48 @@ export const passwordType = {
 export const loginType = {
     type: "string",
     regex: /^[\\w_]{4,100}$/
+} as const;
+export const justDateType = {
+    type: "date",
+    allowOnly: null
+} as const;
+export const futureDateType = {
+    type: "date",
+    allowOnly: "future"
+} as const;
+export const datetimeFutureType = {
+    type: "datetime",
+    allowOnly: "future"
+} as const;
+export const cityType = {
+    type: "string",
+    regex: /.{1,30}/
+} as const;
+export const avatarType = {
+    type: "image",
+    minSize: null,
+    maxSize: {
+        value: 10,
+        unit: "mb"
+    },
+    allowedTypes: ["jpeg", "png", "webp", "svg"],
+    maxWidth: null,
+    minWidth: null,
+    maxHeight: null,
+    minHeight: null,
+    aspectRatio: {
+        width: 1,
+        height: 1
+    }
+} as const;
+export const AnyDocumentType = {
+    type: "file",
+    minSize: null,
+    maxSize: {
+        value: 500,
+        unit: "kb"
+    },
+    allowedMimeTypes: null
 } as const;
 export const citiesEnumType = {
     type: "enum",
