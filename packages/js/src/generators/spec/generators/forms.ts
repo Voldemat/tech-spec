@@ -1,4 +1,4 @@
-import ts, { isStringLiteral } from 'typescript'
+import ts from 'typescript'
 import type { Form } from '../../../spec/types'
 import { BaseSpecGenerator } from './base'
 import { type FormFieldSpec, type FormSpec } from '../../../spec/types/forms'

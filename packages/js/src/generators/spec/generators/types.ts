@@ -1,6 +1,18 @@
 import type ts from 'typescript'
 import { type FormFieldSpec } from '../../../spec/types/forms'
-import { type DateTimeTypeSpec, type DateTypeSpec, type EnumTypeSpec, type FileTypeSpec, type FloatTypeSpec, type ImageTypeSpec, type IntTypeSpec, type StringTypeSpec, type TimeTypeSpec, Type, type TypeSpec, type UnionTypeSpec } from '../../../spec/types/type'
+import type {
+    DateTimeTypeSpec,
+    DateTypeSpec,
+    EnumTypeSpec,
+    FileTypeSpec,
+    FloatTypeSpec,
+    ImageTypeSpec,
+    IntTypeSpec,
+    StringTypeSpec,
+    TimeTypeSpec,
+    TypeSpec,
+    UnionTypeSpec
+} from '../../../spec/types/type'
 import { stringUnionToArray } from '../../../utils'
 
 export interface FormFieldAst {

@@ -23,15 +23,6 @@ export class GenDiffAction implements IAction {
         spec.features = []
         const code = this.container.fsUtils.readGeneratedFiles(outputDir)
         const codeSpec = this.container.specGenerator.fromCode(code)
-        const print = (v: any) => console.log(JSON.stringify(v, null, 4))
-        for (let index = 0; index < spec.types.length; index++) {
-            const one = spec.types[index]
-            const two = codeSpec.types[index]
-            if (!this.container.specUtils.isEqual(one, two)) {
-                console.log(one)
-                console.log(two)
-            }
-        }
         if (this.container.specUtils.isEqual(spec, codeSpec)) {
             return {
                 isError: false,

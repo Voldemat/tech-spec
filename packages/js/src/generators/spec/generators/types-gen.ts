@@ -16,7 +16,13 @@ import {
     type UnionTypeAst,
     type ImageAspectRatioAst
 } from './types'
-import type { DateTimeTypeSpec, FileSize, ImageAspectRatio, ImageTypeSpec, TypeSpec } from '../../../spec/types/type'
+import type {
+    DateTimeTypeSpec,
+    FileSize,
+    ImageAspectRatio,
+    ImageTypeSpec,
+    TypeSpec
+} from '../../../spec/types/type'
 
 export class TypesSpecGenerator extends BaseSpecGenerator<Type> {
     getSpec (nodes: ts.Node[]): Type[] {
