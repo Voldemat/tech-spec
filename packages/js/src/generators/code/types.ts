@@ -61,10 +61,6 @@ export class TypesCodeGenerator extends BaseCodeGenerator<Type> {
         case 'image': return this.buildImageTypeSpec(typeSpec)
         case 'enum': return this.buildEnumTypeSpec(typeSpec)
         case 'union': return this.buildUnionTypeSpec(typeSpec)
-        default: {
-            const a: never = typeSpec // eslint-disable-line
-            return {}
-        }
         };
     }
 
@@ -72,7 +68,7 @@ export class TypesCodeGenerator extends BaseCodeGenerator<Type> {
         return {
             type: this.buildString(typeSpec.type),
             regex: ts.factory.createRegularExpressionLiteral(
-                '/' + String(typeSpec.regex) + '/'
+                '/' + typeSpec.regex.source + '/'
             )
         }
     }
@@ -135,7 +131,7 @@ export class TypesCodeGenerator extends BaseCodeGenerator<Type> {
             minWidth: this.buildNumberOrNull(typeSpec.minWidth),
             maxHeight: this.buildNumberOrNull(typeSpec.maxHeight),
             minHeight: this.buildNumberOrNull(typeSpec.minHeight),
-            aspectRation: this.buildImageAspectRatio(typeSpec.aspectRatio)
+            aspectRatio: this.buildImageAspectRatio(typeSpec.aspectRatio)
         }
     }
 

@@ -79,7 +79,14 @@ export class SpecValidator {
         const types: Record<string, Type> = Object.fromEntries(
             specArray
                 .filter((t): t is Type => t.type === 'type')
-                .map(t => [t.metadata.name, t])
+                .map((t): [string, Type] => [t.metadata.name, t])
+                .sort(([name, _], [name2, __]) => name.localeCompare(name2))
+                .map((t) => {
+                    if (t[1].spec.type === 'string') {
+                        t[1].spec.regex = new RegExp(t[1].spec.regex)
+                    }
+                    return t
+                })
         )
         const typesErrors: string[] = []
         const enums = Object.values(types)
@@ -89,13 +96,8 @@ export class SpecValidator {
             if (enumType.itemType in types) {
                 const itemType = types[enumType.itemType].spec
                 if (
-                    itemType.type !== 'image' &&
-                    itemType.type !== 'union' &&
-                    itemType.type !== 'file' &&
-                    itemType.type !== 'enum'
+                    ['image', 'union', 'file', 'enum'].includes(itemType.type)
                 ) {
-                    enumType.itemTypeSpec = itemType
-                } else {
                     typesErrors.push(
                         `Merging Error: type:${name}` +
                         `.spec.itemType:${enumType.itemType}` +
@@ -118,19 +120,12 @@ export class SpecValidator {
             .map((t): [string, TypeSpec] => ([t.metadata.name, t.spec]))
             .filter((item): item is [string, UnionTypeSpec] => item[1].type === 'union')
         for (const [name, unionType] of unions) {
-            if (unionType.typeSpecs === undefined) {
-                unionType.typeSpecs = {}
-            }
             for (const typeName of unionType.types) {
                 if (typeName in types) {
                     const itemType = types[typeName].spec
                     if (
-                        itemType.type !== 'image' &&
-                        itemType.type !== 'union' &&
-                        itemType.type !== 'file'
+                        ['image', 'union', 'file'].includes(itemType.type)
                     ) {
-                        unionType.typeSpecs[typeName] = itemType
-                    } else {
                         typesErrors.push(
                             `Merging Error: type:${name}` +
                             `.spec.itemType:${typeName}` +

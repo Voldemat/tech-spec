@@ -10,7 +10,6 @@ interface GenDiffActionContainer {
 }
 export class GenDiffAction implements IAction {
     constructor (private readonly container: GenDiffActionContainer) {}
-    /* eslint-disable */
     run (
         specDir: string,
         outputDir: string
@@ -21,10 +20,18 @@ export class GenDiffAction implements IAction {
         }
         const spec = specResult.data
         spec.designSystems = []
-        spec.types = []
         spec.features = []
         const code = this.container.fsUtils.readGeneratedFiles(outputDir)
         const codeSpec = this.container.specGenerator.fromCode(code)
+        const print = (v: any) => console.log(JSON.stringify(v, null, 4))
+        for (let index = 0; index < spec.types.length; index++) {
+            const one = spec.types[index]
+            const two = codeSpec.types[index]
+            if (!this.container.specUtils.isEqual(one, two)) {
+                console.log(one)
+                console.log(two)
+            }
+        }
         if (this.container.specUtils.isEqual(spec, codeSpec)) {
             return {
                 isError: false,

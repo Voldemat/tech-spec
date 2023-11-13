@@ -1,2 +1,2 @@
-export { SpecGenerator } from './spec'
+export { SpecGenerator } from './spec/generators'
 export { CodeFactory } from './code'

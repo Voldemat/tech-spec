@@ -17,17 +17,17 @@ export interface FloatTypeSpec {
     min: number | null
     max: number | null
 }
-export interface DateTypeSpec {
+export interface BaseDateTimeTypeSpec {
+    allowOnly: 'future' | 'past' | null
+}
+export interface DateTypeSpec extends BaseDateTimeTypeSpec {
     type: 'date'
-    allowOnly: 'future' | 'past' | null
 }
-export interface TimeTypeSpec {
+export interface TimeTypeSpec extends BaseDateTimeTypeSpec {
     type: 'time'
-    allowOnly: 'future' | 'past' | null
 }
-export interface DateTimeTypeSpec {
+export interface DateTimeTypeSpec extends BaseDateTimeTypeSpec {
     type: 'datetime'
-    allowOnly: 'future' | 'past' | null
 }
 export interface FileSize {
     unit: 'b' | 'kb' | 'mb' | 'gb'
@@ -71,14 +71,12 @@ export type ScalarTypeSpec = (
 export interface EnumTypeSpec {
     type: 'enum'
     itemType: string
-    itemTypeSpec: BaseScalarTypeSpec
     items: string[]
 }
 export type BaseScalarTypeSpecWithEnum = BaseScalarTypeSpec | EnumTypeSpec
 export interface UnionTypeSpec {
     type: 'union'
     types: string[]
-    typeSpecs: Record<string, BaseScalarTypeSpecWithEnum>
 }
 export type TypeSpec = (
     ScalarTypeSpec |

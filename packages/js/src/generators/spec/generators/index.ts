@@ -1,0 +1,1 @@
+export { SpecGenerator } from './main'

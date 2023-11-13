@@ -31,6 +31,8 @@ export class FsUtils {
             return 'DesignSystem'
         case 'features':
             return 'feature'
+        case 'types':
+            return 'type'
         default:
             return null
         }
