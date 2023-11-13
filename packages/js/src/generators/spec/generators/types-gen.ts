@@ -157,17 +157,13 @@ export class TypesSpecGenerator extends BaseSpecGenerator<Type> {
         }
     }
 
-    private buildTypeErrorMessage (field: string): string {
-        return `"${field}" property is not defined or has invalid type`
-    }
-
     private genTypeAst (
         expression: ts.ObjectLiteralExpression
     ): TypeAst | string {
         const properties = this.filterObjectProperties(expression.properties)
         const typeString = this.extractTypeFromProperties(properties)
         if (typeString === null) {
-            return this.buildTypeErrorMessage('type')
+            return this.buildFieldErrorMessage('type')
         }
         switch (typeString) {
         case 'string': return this.buildStringTypeAst(properties)
@@ -184,20 +180,6 @@ export class TypesSpecGenerator extends BaseSpecGenerator<Type> {
         }
     }
 
-    private filterObjectProperties (
-        properties: ts.NodeArray<ts.ObjectLiteralElementLike>
-    ): Array<[string, ts.Expression]> {
-        return properties
-            .filter((el): el is ts.PropertyAssignment => (
-                el.kind === ts.SyntaxKind.PropertyAssignment
-            ))
-            .map((el): [string, ts.Expression] | null => {
-                if (el.name.kind !== ts.SyntaxKind.Identifier) return null
-                return [el.name.text, el.initializer]
-            })
-            .filter((el): el is [string, ts.Expression] => el !== null)
-    }
-
     private buildStringTypeAst (
         properties: Array<[string, ts.Expression]>
     ): StringTypeAst | string {
@@ -212,7 +194,7 @@ export class TypesSpecGenerator extends BaseSpecGenerator<Type> {
                 }
             }
         }
-        return this.buildTypeErrorMessage('regex')
+        return this.buildFieldErrorMessage('regex')
     }
 
     private buildNumericTypeAst (
@@ -230,8 +212,8 @@ export class TypesSpecGenerator extends BaseSpecGenerator<Type> {
                 if (pName === 'max') max = pValue as NumericTypeAst['max']
             }
         }
-        if (min === null) return this.buildTypeErrorMessage('min')
-        if (max === null) return this.buildTypeErrorMessage('max')
+        if (min === null) return this.buildFieldErrorMessage('min')
+        if (max === null) return this.buildFieldErrorMessage('max')
         return {
             type: typeName,
             min,
@@ -257,7 +239,7 @@ export class TypesSpecGenerator extends BaseSpecGenerator<Type> {
                 }
             }
         }
-        return this.buildTypeErrorMessage('allowOnly')
+        return this.buildFieldErrorMessage('allowOnly')
     }
 
     private buildFileTypeAst (
@@ -268,7 +250,7 @@ export class TypesSpecGenerator extends BaseSpecGenerator<Type> {
         for (const field of ['minSize', 'maxSize', 'allowedMimeTypes']) {
             if (
                 ast[field as keyof FileTypeAst] === undefined
-            ) return this.buildTypeErrorMessage(field)
+            ) return this.buildFieldErrorMessage(field)
         }
         return ast as FileTypeAst
     }
@@ -304,7 +286,7 @@ export class TypesSpecGenerator extends BaseSpecGenerator<Type> {
         if (ts.isObjectLiteralExpression(pValue)) {
             const size = this.buildFileSizeAst(pValue)
             if (typeof size === 'string') {
-                return this.buildTypeErrorMessage(`${pName}.${size}`)
+                return this.buildFieldErrorMessage(`${pName}.${size}`)
             }
             ast[pName] = size
         } else if (pValue.kind === ts.SyntaxKind.NullKeyword) {
@@ -345,7 +327,7 @@ export class TypesSpecGenerator extends BaseSpecGenerator<Type> {
         if (typeof ast === 'string') return ast
         for (const pName of imageTypeSpecPropertyNames) {
             if (ast[pName] === undefined) {
-                return this.buildTypeErrorMessage(pName)
+                return this.buildFieldErrorMessage(pName)
             }
         }
         return ast as ImageTypeAst
@@ -424,8 +406,8 @@ export class TypesSpecGenerator extends BaseSpecGenerator<Type> {
                 }
             }
         }
-        if (items === null) return this.buildTypeErrorMessage('items')
-        if (itemType === null) return this.buildTypeErrorMessage('itemType')
+        if (items === null) return this.buildFieldErrorMessage('items')
+        if (itemType === null) return this.buildFieldErrorMessage('itemType')
         return {
             type: 'enum',
             items,
@@ -441,7 +423,7 @@ export class TypesSpecGenerator extends BaseSpecGenerator<Type> {
             if (!ts.isArrayLiteralExpression(pValue)) continue
             return { type: 'union', types: pValue }
         }
-        return this.buildTypeErrorMessage('types')
+        return this.buildFieldErrorMessage('types')
     }
 
     private setAspectRatioAst (
@@ -471,19 +453,13 @@ export class TypesSpecGenerator extends BaseSpecGenerator<Type> {
     private extractTypeFromProperties (
         properties: Array<[string, ts.Expression]>
     ): TypeSpec['type'] | null {
-        let t: TypeSpec['type'] | null = null
-        properties
-            .forEach(([pName, pValue]) => {
-                if (
-                    pName === 'type' &&
-                    pValue.kind === ts.SyntaxKind.StringLiteral &&
-                    typeSpecTypes.includes(
-                        (pValue as ts.StringLiteral).text as any
-                    )
-                ) {
-                    t = (pValue as ts.StringLiteral).text as TypeSpec['type']
-                }
-            })
-        return t
+        const typeNode = this.extractKeyFromProperties<ts.StringLiteral>(
+            properties,
+            'type',
+            ts.SyntaxKind.StringLiteral
+        )
+        if (typeNode === null) return null
+        if (!typeSpecTypes.includes(typeNode.text as any)) return null
+        return typeNode.text as TypeSpec['type']
     }
 }

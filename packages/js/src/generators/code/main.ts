@@ -3,6 +3,7 @@ import type { TechSpec, TechSpecContainer } from '../../spec/types'
 import { FormsCodeGenerator } from '../code/forms'
 import { DesignSystemCodeGenerator } from './designSystem'
 import { TypesCodeGenerator } from './types'
+import { FeaturesCodeGenerator } from './features'
 
 export class CodeFactory {
     private readonly printer: Printer
@@ -10,6 +11,7 @@ export class CodeFactory {
     private readonly forms: FormsCodeGenerator
     private readonly designSystems: DesignSystemCodeGenerator
     private readonly types: TypesCodeGenerator
+    private readonly features: FeaturesCodeGenerator
     constructor () {
         this.printer = ts.createPrinter({ })
         this.sourceFile = ts.createSourceFile(
@@ -22,6 +24,7 @@ export class CodeFactory {
         this.types = new TypesCodeGenerator()
         this.forms = new FormsCodeGenerator(this.types)
         this.designSystems = new DesignSystemCodeGenerator()
+        this.features = new FeaturesCodeGenerator()
     }
 
     generate (
@@ -32,21 +35,23 @@ export class CodeFactory {
             DesignSystem: this.render(
                 this.designSystems.genCode(spec.designSystems)
             ),
-            feature: undefined,
+            feature: this.render(
+                this.features.genCode(spec.features)
+            ),
             type: this.render(this.types.genCode(spec.types))
         }
     }
 
     protected render (nodes: ts.Node[]): string | undefined {
         if (nodes.length === 0) return undefined
-        const string = this.printer.printList(
+        const sourceCode = this.printer.printList(
             ts.ListFormat.MultiLine,
             ts.factory.createNodeArray(nodes),
             this.sourceFile
         )
         return JSON.parse(
             JSON.stringify(
-                string.replace(/\\u/g, '%u')
+                sourceCode.replace(/\\u/g, '%u')
             ).replace(/%u/g, '\\u')
         )
     }

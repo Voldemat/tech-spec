@@ -14,6 +14,7 @@ import type {
     UnionTypeSpec
 } from '../../../spec/types/type'
 import { stringUnionToArray } from '../../../utils'
+import { type FeatureFieldSpec } from '../../../spec/types/feature'
 
 export interface FormFieldAst {
     type: ts.StringLiteral
@@ -125,4 +126,18 @@ export const imageTypeSpecPropertyNames = stringUnionToArray<
     'allowedTypes',
     'minHeight',
     'maxHeight'
+)
+
+export const featureSpecTypes = stringUnionToArray<FeatureFieldSpec['type']>()(
+    'string',
+    'uuid',
+    'string',
+    'link',
+    'date',
+    'time',
+    'date-time',
+    'duration',
+    'int',
+    'uint',
+    'float'
 )

@@ -3,7 +3,7 @@ import type { TechSpec } from '../../spec/types'
 
 export abstract class BaseCodeGenerator<T extends TechSpec> {
     abstract genCode (items: T[]): ts.Node[]
-    buildVariable (
+    protected buildVariable (
         name: string, value: ts.Expression, isExported: boolean = false
     ): ts.VariableStatement {
         const modifiers: ts.ModifierLike[] = []
@@ -26,7 +26,7 @@ export abstract class BaseCodeGenerator<T extends TechSpec> {
         )
     }
 
-    buildAsConst (value: ts.Expression): ts.Expression {
+    protected buildAsConst (value: ts.Expression): ts.AsExpression {
         return ts.factory.createAsExpression(
             value,
             ts.factory.createTypeReferenceNode(
@@ -36,31 +36,41 @@ export abstract class BaseCodeGenerator<T extends TechSpec> {
         )
     }
 
-    buildObject (
+    protected buildStringOrNumber (
+        value: string | number
+    ): ts.StringLiteral | ts.NumericLiteral {
+        if (typeof value === 'string') return this.buildString(value)
+        return this.buildNumber(value)
+    }
+
+    protected buildObject (
         properties: ts.PropertyAssignment[],
         multiline: boolean = true
     ): ts.ObjectLiteralExpression {
         return ts.factory.createObjectLiteralExpression(properties, multiline)
     }
 
-    buildProperty (name: string, value: ts.Expression): ts.PropertyAssignment {
+    protected buildProperty (
+        name: string,
+        value: ts.Expression
+    ): ts.PropertyAssignment {
         return ts.factory.createPropertyAssignment(
             ts.factory.createIdentifier(name),
             value
         )
     }
 
-    buildStringProperties (
+    protected buildStringProperties (
         items: Array<[string, ts.Expression]>
     ): ts.PropertyAssignment[] {
         return items.map(([key, value]) => this.buildProperty(key, value))
     }
 
-    buildBoolean (value: boolean): ts.BooleanLiteral {
+    protected buildBoolean (value: boolean): ts.BooleanLiteral {
         return value ? ts.factory.createTrue() : ts.factory.createFalse()
     }
 
-    buildStringOrNull (
+    protected buildStringOrNull (
         value: string | null
     ): ts.StringLiteral | ts.NullLiteral {
         return value !== null
@@ -68,15 +78,15 @@ export abstract class BaseCodeGenerator<T extends TechSpec> {
             : ts.factory.createNull()
     }
 
-    buildString (value: string): ts.StringLiteral {
+    protected buildString (value: string): ts.StringLiteral {
         return ts.factory.createStringLiteral(value)
     }
 
-    buildNumber (value: number): ts.NumericLiteral {
+    protected buildNumber (value: number): ts.NumericLiteral {
         return ts.factory.createNumericLiteral(value)
     }
 
-    buildNumberOrNull (
+    protected buildNumberOrNull (
         value: number | null
     ): ts.NumericLiteral | ts.NullLiteral {
         return value !== null
@@ -84,7 +94,7 @@ export abstract class BaseCodeGenerator<T extends TechSpec> {
             : ts.factory.createNull()
     }
 
-    buildImportStatement (
+    protected buildImportStatement (
         imports: string[], from: string
     ): ts.ImportDeclaration {
         return ts.factory.createImportDeclaration(
@@ -107,15 +117,15 @@ export abstract class BaseCodeGenerator<T extends TechSpec> {
         )
     }
 
-    buildArray (items: ts.Expression[]): ts.ArrayLiteralExpression {
+    protected buildArray (items: ts.Expression[]): ts.ArrayLiteralExpression {
         return ts.factory.createArrayLiteralExpression(items)
     }
 
-    buildStringArray (items: string[]): ts.ArrayLiteralExpression {
+    protected buildStringArray (items: string[]): ts.ArrayLiteralExpression {
         return this.buildArray(items.map(this.buildString))
     }
 
-    buildStringArrayOrNull (
+    protected buildStringArrayOrNull (
         items: string[] | null
     ): ts.ArrayLiteralExpression | ts.NullLiteral {
         return items === null
