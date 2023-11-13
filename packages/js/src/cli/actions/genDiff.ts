@@ -19,7 +19,6 @@ export class GenDiffAction implements IAction {
             return specResult.data
         }
         const spec = specResult.data
-        spec.designSystems = []
         const code = this.container.fsUtils.readGeneratedFiles(outputDir)
         const codeSpec = this.container.specGenerator.fromCode(code)
         if (this.container.specUtils.isEqual(spec, codeSpec)) {
